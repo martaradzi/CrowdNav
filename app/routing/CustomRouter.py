@@ -114,3 +114,21 @@ class CustomRouter(object):
             cls.edgeMap[edge].applyEdgeDurationToAverage(duration, tick)
         except:
             return 1
+
+    @classmethod
+    def route_by_max_speed(cls, fr, to, tick, car):
+        """ creates a route from the f(node) to the t(node) """
+        cost_func = lambda u, v, e, prev_e: (1 / e['maxSpeed'])
+        route = find_path(cls.graph, fr, to, cost_func=cost_func)
+        return RouterResult(route, False)
+
+    @classmethod
+    def route_by_min_length(cls, fr, to, tick, car):
+        """ creates a route from the f(node) to the t(node) """
+        cost_func = lambda u, v, e, prev_e: (e['length'])
+        route = find_path(cls.graph, fr, to, cost_func=cost_func)
+        return RouterResult(route, False)
+
+    @classmethod
+    def calculate_length_of_route(cls, route):
+        return sum([cls.edgeMap[e].length for e in route])

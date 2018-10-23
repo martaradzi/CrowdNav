@@ -2,6 +2,7 @@ import random
 import traci
 import traci.constants as tc
 from app import Config
+import csv
 
 from app.Util import addToAverage
 from app.logging import CSVLogger
@@ -45,6 +46,8 @@ class Car:
         self.smartCar = Config.smartCarPercentage > random.random()
         # number of ticks since last reroute / arrival
         self.lastRerouteCounter = 0
+
+        self.driver_preference = random.choice(["balanced", "min_length", "max_speed"])
 
     def setArrived(self, tick):
         """ car arrived at its target, so we add some statistic data """
@@ -101,6 +104,25 @@ class Car:
         self.targetID = random.choice(Network.nodes).getID()
         self.currentRouteID = self.id + "-" + str(self.rounds)
         self.currentRouterResult = CustomRouter.route(self.sourceID, self.targetID, tick, self)
+
+        router_res_length = CustomRouter.route_by_min_length(self.sourceID, self.targetID, tick, self)
+        self.create_output_file(
+            router_res_length.totalCost,
+            router_res_length.route,
+            self.driver_preference=="min_length")
+
+        router_res_speeds = CustomRouter.route_by_max_speed(self.sourceID, self.targetID, tick, self)
+        self.create_output_file(
+            CustomRouter.calculate_length_of_route(router_res_speeds.route),
+            router_res_speeds.route,
+            self.driver_preference=="max_speed")
+
+        router_res_length_and_speeds = CustomRouter.minimalRoute(self.sourceID, self.targetID, tick, self)
+        self.create_output_file(
+            CustomRouter.calculate_length_of_route(router_res_length_and_speeds.route),
+            router_res_length_and_speeds.route,
+            self.driver_preference=="balanced")
+
         if len(self.currentRouterResult.route) > 0:
             traci.route.add(self.currentRouteID, self.currentRouterResult.route)
             # set color to red
@@ -108,6 +130,14 @@ class Car:
         else:
             # recursion aka. try again as this should work!
             return self.__createNewRoute(tick)
+
+    def create_output_file(self, cost, route, preferred = False):
+        print "new route for " + str(self.id) + " with preference " + self.driver_preference
+        with open('./data/agent_' + str(self.id) + '.plans', 'ab') as mycsvfile:
+            cost = 0.8 * cost if preferred else cost
+            mycsvfile.write(str(cost) + ":")
+            writer = csv.writer(mycsvfile, dialect='excel')
+            writer.writerow([1 if edge in route else 0 for edge in Network.edgeIds])
 
     def processTick(self, tick):
         """ process changes that happened in the tick to this car """
