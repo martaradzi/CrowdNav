@@ -137,7 +137,8 @@ class Car:
             cost = 0.8 * cost if preferred else cost
             mycsvfile.write(str(cost) + ":")
             writer = csv.writer(mycsvfile, dialect='excel')
-            writer.writerow([1 if edge in route else 0 for edge in Network.edgeIds])
+            writer.writerow([1/edge.length if edge.id in route else 0 for edge in Network.routingEdges])
+            # writer.writerow([1 if edge in route else 0 for edge in Network.edgeIds])
 
     def processTick(self, tick):
         """ process changes that happened in the tick to this car """
