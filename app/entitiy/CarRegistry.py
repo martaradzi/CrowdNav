@@ -35,8 +35,8 @@ class CarRegistry(object):
         """ syncs the value of the carCounter to the SUMO simulation """
         while len(CarRegistry.cars) < cls.totalCarCounter:
             # to less cars -> add new
-            cls.carIndexCounter += 1
             c = Car("car-" + str(CarRegistry.carIndexCounter))
+            cls.carIndexCounter += 1
             cls.cars[c.id] = c
             c.addToSimulation(0)
         while len(CarRegistry.cars) > cls.totalCarCounter:
