@@ -105,23 +105,24 @@ class Car:
         self.currentRouteID = self.id + "-" + str(self.rounds)
         self.currentRouterResult = CustomRouter.route(self.sourceID, self.targetID, tick, self)
 
-        router_res_length = CustomRouter.route_by_min_length(self.sourceID, self.targetID, tick, self)
-        self.create_output_file(
-            router_res_length.totalCost,
-            router_res_length.route,
-            self.driver_preference=="min_length")
+        if Config.epos_mode:
+            router_res_length = CustomRouter.route_by_min_length(self.sourceID, self.targetID, tick, self)
+            self.create_output_file(
+                router_res_length.totalCost,
+                router_res_length.route,
+                self.driver_preference=="min_length")
 
-        router_res_speeds = CustomRouter.route_by_max_speed(self.sourceID, self.targetID, tick, self)
-        self.create_output_file(
-            CustomRouter.calculate_length_of_route(router_res_speeds.route),
-            router_res_speeds.route,
-            self.driver_preference=="max_speed")
+            router_res_speeds = CustomRouter.route_by_max_speed(self.sourceID, self.targetID, tick, self)
+            self.create_output_file(
+                CustomRouter.calculate_length_of_route(router_res_speeds.route),
+                router_res_speeds.route,
+                self.driver_preference=="max_speed")
 
-        router_res_length_and_speeds = CustomRouter.minimalRoute(self.sourceID, self.targetID, tick, self)
-        self.create_output_file(
-            CustomRouter.calculate_length_of_route(router_res_length_and_speeds.route),
-            router_res_length_and_speeds.route,
-            self.driver_preference=="balanced")
+            router_res_length_and_speeds = CustomRouter.minimalRoute(self.sourceID, self.targetID, tick, self)
+            self.create_output_file(
+                CustomRouter.calculate_length_of_route(router_res_length_and_speeds.route),
+                router_res_length_and_speeds.route,
+                self.driver_preference=="balanced")
 
         if len(self.currentRouterResult.route) > 0:
             traci.route.add(self.currentRouteID, self.currentRouterResult.route)

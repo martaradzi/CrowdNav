@@ -42,3 +42,5 @@ smartCarPercentage = 1
 # runtime dependent variable
 processID = 0
 parallelMode = False
+
+epos_mode = False
