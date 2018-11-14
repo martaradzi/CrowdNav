@@ -13263,7 +13263,7 @@
         <lane id="-3036#2_0" index="0" speed="13.89" length="50.55" shape="2518.98,1846.86 2468.83,1853.15"/>
     </edge>
     <edge id="-3036#3" from="2284" to="2269" priority="7" type="highway.residential">
-        <lane id="-3036#3_0" index="0" speed="13.89" length="2.20" shape="2521.45,1846.43 2521.25,1846.45"/>
+        <lane id="-3036#3_0" index="0" speed="13.89" length="0.20" shape="2521.45,1846.43 2521.25,1846.45"/>
     </edge>
     <edge id="-3036#4" from="2255" to="2284" priority="7" type="highway.residential" shape="2698.05,1810.75 2624.71,1825.17 2554.62,1839.15 2534.43,1843.06">
         <lane id="-3036#4_0" index="0" speed="13.89" length="174.88" shape="2708.40,1810.40 2625.03,1826.79 2554.94,1840.77 2536.83,1844.28"/>
@@ -14996,7 +14996,7 @@
         <lane id="3036#2_0" index="0" speed="13.89" length="50.55" shape="2468.42,1849.88 2518.57,1843.58"/>
     </edge>
     <edge id="3036#3" from="2269" to="2284" priority="7" type="highway.residential">
-        <lane id="3036#3_0" index="0" speed="13.89" length="2.20" shape="2520.82,1843.18 2521.02,1843.16"/>
+        <lane id="3036#3_0" index="0" speed="13.89" length="0.20" shape="2520.82,1843.18 2521.02,1843.16"/>
     </edge>
     <edge id="3036#4" from="2284" to="2255" priority="7" type="highway.residential" shape="2534.43,1843.06 2554.62,1839.15 2624.71,1825.17 2698.05,1810.75">
         <lane id="3036#4_0" index="0" speed="13.89" length="174.88" shape="2536.20,1841.04 2554.30,1837.53 2624.39,1823.55 2707.76,1807.16"/>
