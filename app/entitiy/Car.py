@@ -47,6 +47,8 @@ class Car:
         # number of ticks since last reroute / arrival
         self.lastRerouteCounter = 0
 
+        self.vehicle_length = 5
+
         self.driver_preference = random.choice(["balanced", "min_length", "max_speed"])
 
     def setArrived(self, tick):
@@ -107,21 +109,25 @@ class Car:
 
         if Config.epos_mode:
             router_res_length = CustomRouter.route_by_min_length(self.sourceID, self.targetID, tick, self)
+
             self.create_output_file(
                 router_res_length.totalCost,
                 router_res_length.route,
+                self.find_occupancy_for_route(router_res_length.meta),
                 self.driver_preference=="min_length")
 
             router_res_speeds = CustomRouter.route_by_max_speed(self.sourceID, self.targetID, tick, self)
             self.create_output_file(
                 CustomRouter.calculate_length_of_route(router_res_speeds.route),
                 router_res_speeds.route,
+                self.find_occupancy_for_route(router_res_length.meta),
                 self.driver_preference=="max_speed")
 
             router_res_length_and_speeds = CustomRouter.minimalRoute(self.sourceID, self.targetID, tick, self)
             self.create_output_file(
                 CustomRouter.calculate_length_of_route(router_res_length_and_speeds.route),
                 router_res_length_and_speeds.route,
+                self.find_occupancy_for_route(router_res_length.meta),
                 self.driver_preference=="balanced")
 
         if len(self.currentRouterResult.route) > 0:
@@ -132,14 +138,32 @@ class Car:
             # recursion aka. try again as this should work!
             return self.__createNewRoute(tick)
 
-    def create_output_file(self, cost, route, preferred = False):
+    def create_output_file(self, cost, route, all_routes, preferred = False):
         print "new route for " + str(self.id) + " with preference " + self.driver_preference
-        with open('./data/agent_' + str(self.id) + '.plans', 'ab') as mycsvfile:
-            cost = 0.8 * cost if preferred else cost
-            mycsvfile.write(str(cost) + ":")
+        agent_ind = self.id[self.id.find("-")+1:]
+        with open('./data/agent_' + agent_ind + '.plans', 'ab') as mycsvfile:
+
             writer = csv.writer(mycsvfile, dialect='excel')
-            vehicle_length = 5
-            writer.writerow([vehicle_length/edge.length if edge.id in route else 0 for edge in Network.routingEdges])
+
+            # writer.writerow([edge.id for edge in Network.routingEdges])
+
+            cost = 0.8 * cost if preferred else cost
+
+            # mycsvfile.write(str(cost) + ":")
+            # writer.writerow([self.vehicle_length/edge.length if edge.id in route else 0 for edge in Network.routingEdges])
+
+            mycsvfile.write(str(cost) + ":")
+            big_row = []
+
+            for i in range(3):
+                if i< len(all_routes):
+                    d = all_routes[i]
+                    big_row += [d[edge.id] if edge.id in d else 0 for edge in Network.routingEdges]
+                else:
+                    big_row += [0 for edge in Network.routingEdges]
+
+            writer.writerow(big_row)
+
             # writer.writerow([1 if edge in route else 0 for edge in Network.edgeIds])
 
     def processTick(self, tick):
@@ -204,6 +228,54 @@ class Car:
             print("error adding" + str(e))
             # try recursion, as this should normally work
             # self.addToSimulation(tick)
+
+
+    def find_occupancy_for_route(self, meta):
+        # [0-100] [101-200] [201-300]
+        all_streets = []
+        trip_time = 0
+        interval = 100
+        checkpoint_index = 1
+        # print "---------"
+        streets_for_interval = {}
+        all_streets.append(streets_for_interval)
+
+        for m in meta:
+
+            # print m
+            time =  m["length"]/ m["maxSpeed"]
+            # print "time on lane: " + str(time)
+            length = m["length"]
+
+            trip_time += time
+            # print trip_time
+            next_checkpoint = interval * checkpoint_index
+            if trip_time > next_checkpoint :
+                # print "*****"
+                surplus_time = trip_time - next_checkpoint
+                checkpoint_index += 1
+                time = time - surplus_time
+                percentage = time/interval
+                streets_for_interval[m["edgeID"]] = self.vehicle_length*percentage/length
+                streets_for_interval = {}
+                all_streets.append(streets_for_interval)
+                percentage_surplus = surplus_time/interval
+                streets_for_interval[m["edgeID"]] = self.vehicle_length*percentage_surplus/length
+            else:
+                percentage = time/interval
+                # print "percentage of time on lane: " + str(percentage)
+                streets_for_interval[m["edgeID"]] = self.vehicle_length*percentage/length
+
+        # print trip_time
+        # print "---------"
+
+        # for l in all_streets:
+        #     print "########################################"
+        #     for k in l:
+        #         print k
+        #         print l[k]
+
+        return all_streets
 
     def remove(self):
         """" removes this car from the sumo simulation through traci """
