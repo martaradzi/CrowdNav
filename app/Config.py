@@ -43,4 +43,4 @@ smartCarPercentage = 1
 processID = 0
 parallelMode = False
 
-epos_mode = False
+epos_mode = True

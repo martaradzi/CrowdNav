@@ -120,14 +120,14 @@ class Car:
             self.create_output_file(
                 CustomRouter.calculate_length_of_route(router_res_speeds.route),
                 router_res_speeds.route,
-                self.find_occupancy_for_route(router_res_length.meta),
+                self.find_occupancy_for_route(router_res_speeds.meta),
                 self.driver_preference=="max_speed")
 
             router_res_length_and_speeds = CustomRouter.minimalRoute(self.sourceID, self.targetID, tick, self)
             self.create_output_file(
                 CustomRouter.calculate_length_of_route(router_res_length_and_speeds.route),
                 router_res_length_and_speeds.route,
-                self.find_occupancy_for_route(router_res_length.meta),
+                self.find_occupancy_for_route(router_res_length_and_speeds.meta),
                 self.driver_preference=="balanced")
 
         if len(self.currentRouterResult.route) > 0:
@@ -139,7 +139,7 @@ class Car:
             return self.__createNewRoute(tick)
 
     def create_output_file(self, cost, route, all_routes, preferred = False):
-        print "new route for " + str(self.id) + " with preference " + self.driver_preference
+        # print "new route for " + str(self.id) + " with preference " + self.driver_preference
         agent_ind = self.id[self.id.find("-")+1:]
         with open('./data/agent_' + agent_ind + '.plans', 'ab') as mycsvfile:
 
@@ -231,7 +231,7 @@ class Car:
 
 
     def find_occupancy_for_route(self, meta):
-        # [0-100] [101-200] [201-300]
+        # [0-100] [101-200] [201-300] ...
         all_streets = []
         trip_time = 0
         interval = 100
@@ -240,40 +240,63 @@ class Car:
         streets_for_interval = {}
         all_streets.append(streets_for_interval)
 
+        print "--- NEW ROUTE ---"
         for m in meta:
-
-            # print m
+            print "### NEW STREET ###"
             time =  m["length"]/ m["maxSpeed"]
-            # print "time on lane: " + str(time)
             length = m["length"]
 
             trip_time += time
-            # print trip_time
             next_checkpoint = interval * checkpoint_index
+
+            print "next_checkpoint : " + str(next_checkpoint)
+            print "trip_time : " + str(trip_time)
+            print "street time : " + str(time)
+
             if trip_time > next_checkpoint :
-                # print "*****"
+                print "&&& SURPLUS DETECTED &&&"
                 surplus_time = trip_time - next_checkpoint
                 checkpoint_index += 1
                 time = time - surplus_time
+                print "surplus_time: " + str(surplus_time)
+                print "new time for interval: " + str(time)
                 percentage = time/interval
-                streets_for_interval[m["edgeID"]] = self.vehicle_length*percentage/length
+                occupancy = self.vehicle_length*percentage/length
+                if occupancy < 0:
+                    raise RuntimeError
+
+                streets_for_interval[m["edgeID"]] = occupancy
+
+                while surplus_time > interval:
+                    print "!!! SURPLUS HIGHER THAN INTERVAL !!!"
+                    print "next_checkpoint : " + str(interval * checkpoint_index)
+                    print "surplus_time: " + str(surplus_time)
+                    streets_for_interval = {}
+                    all_streets.append(streets_for_interval)
+                    occupancy = self.vehicle_length/length
+                    if occupancy < 0:
+                        raise RuntimeError
+                    streets_for_interval[m["edgeID"]] = occupancy
+                    surplus_time -= interval
+                    checkpoint_index += 1
+
+                print "FINAL surplus_time: " + str(surplus_time)
                 streets_for_interval = {}
                 all_streets.append(streets_for_interval)
                 percentage_surplus = surplus_time/interval
-                streets_for_interval[m["edgeID"]] = self.vehicle_length*percentage_surplus/length
+                occupancy = self.vehicle_length*percentage_surplus/length
+                print "occupancy3 : " + str(occupancy)
+                if occupancy < 0:
+                    raise RuntimeError
+                streets_for_interval[m["edgeID"]] = occupancy
+
             else:
+                print "%%% NO SURPLUS DETECTED %%%"
                 percentage = time/interval
-                # print "percentage of time on lane: " + str(percentage)
-                streets_for_interval[m["edgeID"]] = self.vehicle_length*percentage/length
-
-        # print trip_time
-        # print "---------"
-
-        # for l in all_streets:
-        #     print "########################################"
-        #     for k in l:
-        #         print k
-        #         print l[k]
+                occupancy = self.vehicle_length*percentage/length
+                if occupancy < 0:
+                    raise RuntimeError
+                streets_for_interval[m["edgeID"]] = occupancy
 
         return all_streets
 
