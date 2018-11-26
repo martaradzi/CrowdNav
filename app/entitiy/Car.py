@@ -110,21 +110,21 @@ class Car:
         if Config.epos_mode:
             router_res_length = CustomRouter.route_by_min_length(self.sourceID, self.targetID, tick, self)
 
-            self.create_output_file(
+            self.create_output_files(
                 router_res_length.totalCost,
                 router_res_length.route,
                 self.find_occupancy_for_route(router_res_length.meta),
                 self.driver_preference=="min_length")
 
             router_res_speeds = CustomRouter.route_by_max_speed(self.sourceID, self.targetID, tick, self)
-            self.create_output_file(
+            self.create_output_files(
                 CustomRouter.calculate_length_of_route(router_res_speeds.route),
                 router_res_speeds.route,
                 self.find_occupancy_for_route(router_res_speeds.meta),
                 self.driver_preference=="max_speed")
 
             router_res_length_and_speeds = CustomRouter.minimalRoute(self.sourceID, self.targetID, tick, self)
-            self.create_output_file(
+            self.create_output_files(
                 CustomRouter.calculate_length_of_route(router_res_length_and_speeds.route),
                 router_res_length_and_speeds.route,
                 self.find_occupancy_for_route(router_res_length_and_speeds.meta),
@@ -138,21 +138,23 @@ class Car:
             # recursion aka. try again as this should work!
             return self.__createNewRoute(tick)
 
-    def create_output_file(self, cost, route, all_routes, preferred = False):
+    def create_output_files(self, cost, route, all_routes, preferred = False):
         # print "new route for " + str(self.id) + " with preference " + self.driver_preference
         agent_ind = self.id[self.id.find("-")+1:]
-        with open('./data/agent_' + agent_ind + '.plans', 'ab') as mycsvfile:
+        with open('./data/agent_' + agent_ind + '.plans', 'ab') as epos_file, open('./data/agent_' + agent_ind + '.routes', 'ab') as routes_file:
 
-            writer = csv.writer(mycsvfile, dialect='excel')
+            epos_writer = csv.writer(epos_file, dialect='excel')
+            routes_writer = csv.writer(routes_file, dialect='excel')
+            routes_writer.writerow(route)
 
-            # writer.writerow([edge.id for edge in Network.routingEdges])
+            # epos_writer.writerow([edge.id for edge in Network.routingEdges])
 
             cost = 0.8 * cost if preferred else cost
 
-            # mycsvfile.write(str(cost) + ":")
-            # writer.writerow([self.vehicle_length/edge.length if edge.id in route else 0 for edge in Network.routingEdges])
+            # epos_file.write(str(cost) + ":")
+            # epos_writer.writerow([self.vehicle_length/edge.length if edge.id in route else 0 for edge in Network.routingEdges])
 
-            mycsvfile.write(str(cost) + ":")
+            epos_file.write(str(cost) + ":")
             big_row = []
 
             for i in range(3):
@@ -162,9 +164,8 @@ class Car:
                 else:
                     big_row += [0 for edge in Network.routingEdges]
 
-            writer.writerow(big_row)
-
-            # writer.writerow([1 if edge in route else 0 for edge in Network.edgeIds])
+            epos_writer.writerow(big_row)
+            # epos_writer.writerow([1 if edge in route else 0 for edge in Network.edgeIds])
 
     def processTick(self, tick):
         """ process changes that happened in the tick to this car """
@@ -204,6 +205,12 @@ class Car:
             self.currentEdgeID = roadID
             pass
 
+
+    def changeRoute(self, route):
+        self.currentRouterResult.route = route
+        traci.vehicle.setRoute(self.id, self.currentRouterResult.route)
+
+
     def addToSimulation(self, tick):
         """ adds this car to the simulation through the traci API """
         self.currentRouteBeginTick = tick
@@ -240,26 +247,26 @@ class Car:
         streets_for_interval = {}
         all_streets.append(streets_for_interval)
 
-        print "--- NEW ROUTE ---"
+        # print "--- NEW ROUTE ---"
         for m in meta:
-            print "### NEW STREET ###"
+            # print "### NEW STREET ###"
             time =  m["length"]/ m["maxSpeed"]
             length = m["length"]
 
             trip_time += time
             next_checkpoint = interval * checkpoint_index
 
-            print "next_checkpoint : " + str(next_checkpoint)
-            print "trip_time : " + str(trip_time)
-            print "street time : " + str(time)
+            # print "next_checkpoint : " + str(next_checkpoint)
+            # print "trip_time : " + str(trip_time)
+            # print "street time : " + str(time)
 
             if trip_time > next_checkpoint :
-                print "&&& SURPLUS DETECTED &&&"
+                # print "&&& SURPLUS DETECTED &&&"
                 surplus_time = trip_time - next_checkpoint
                 checkpoint_index += 1
                 time = time - surplus_time
-                print "surplus_time: " + str(surplus_time)
-                print "new time for interval: " + str(time)
+                # print "surplus_time: " + str(surplus_time)
+                # print "new time for interval: " + str(time)
                 percentage = time/interval
                 occupancy = self.vehicle_length*percentage/length
                 if occupancy < 0:
@@ -268,9 +275,9 @@ class Car:
                 streets_for_interval[m["edgeID"]] = occupancy
 
                 while surplus_time > interval:
-                    print "!!! SURPLUS HIGHER THAN INTERVAL !!!"
-                    print "next_checkpoint : " + str(interval * checkpoint_index)
-                    print "surplus_time: " + str(surplus_time)
+                    # print "!!! SURPLUS HIGHER THAN INTERVAL !!!"
+                    # print "next_checkpoint : " + str(interval * checkpoint_index)
+                    # print "surplus_time: " + str(surplus_time)
                     streets_for_interval = {}
                     all_streets.append(streets_for_interval)
                     occupancy = self.vehicle_length/length
@@ -280,18 +287,18 @@ class Car:
                     surplus_time -= interval
                     checkpoint_index += 1
 
-                print "FINAL surplus_time: " + str(surplus_time)
+                # print "FINAL surplus_time: " + str(surplus_time)
                 streets_for_interval = {}
                 all_streets.append(streets_for_interval)
                 percentage_surplus = surplus_time/interval
                 occupancy = self.vehicle_length*percentage_surplus/length
-                print "occupancy3 : " + str(occupancy)
+                # print "occupancy3 : " + str(occupancy)
                 if occupancy < 0:
                     raise RuntimeError
                 streets_for_interval[m["edgeID"]] = occupancy
 
             else:
-                print "%%% NO SURPLUS DETECTED %%%"
+                # print "%%% NO SURPLUS DETECTED %%%"
                 percentage = time/interval
                 occupancy = self.vehicle_length*percentage/length
                 if occupancy < 0:

@@ -49,6 +49,7 @@ class Simulation(object):
         # apply the configuration from the json file
         cls.applyFileConfig()
         CarRegistry.applyCarCounter()
+        CarRegistry.selectOptimalRoutes()
         cls.loop()
 
     @classmethod

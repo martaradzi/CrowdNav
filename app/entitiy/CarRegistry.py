@@ -31,6 +31,24 @@ class CarRegistry(object):
     # @todo on shortest path possible -> minimal value
 
     @classmethod
+    def selectOptimalRoutes(cls):
+
+        with open('./selected-plans.csv', 'r') as results:
+            line_id = 1
+            for line in results:
+                if line_id == 41:
+                    res = [int(x) for x in line.split(",")[2:]]
+                    break
+                line_id += 1
+
+        for i in range(0, cls.carIndexCounter):
+            c = cls.cars["car-" + str(i)]
+            with open('./data/agent_' + str(i) + '.routes', 'r') as plans_file:
+                plans=plans_file.readlines()
+            selected_route = plans[res[i]].replace('\r', '').replace('\n', '').split(",")
+            c.changeRoute(selected_route)
+
+    @classmethod
     def applyCarCounter(cls):
         """ syncs the value of the carCounter to the SUMO simulation """
         while len(CarRegistry.cars) < cls.totalCarCounter:
