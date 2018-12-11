@@ -26,6 +26,7 @@ def start(processID, parallelMode,useGUI):
 
     Config.kafkaTopicTrips = "crowd-nav-trips-" + str(processID)
     Config.kafkaCommandsTopic = "crowd-nav-commands-" + str(processID)
+    Config.kafkaTopicPerformance = "crowd-nav-performance-" + str(processID)
 
     info('#####################################', Fore.CYAN)
     info('#      Starting CrowdNav v0.2       #', Fore.CYAN)
