@@ -15,10 +15,14 @@ import Config
 import traci, sys, os
 import thread
 import time
+import random
 
 
 # uuid4()
 def start(processID, parallelMode,useGUI):
+
+    random.seed(Config.random_seed)
+
     """ main entry point into the application """
     Config.processID = processID
     Config.parallelMode = parallelMode

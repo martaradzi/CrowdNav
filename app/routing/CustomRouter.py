@@ -1,4 +1,4 @@
-from random import gauss, random
+from random import gauss
 
 import sys
 from dijkstar import Graph, find_path
@@ -64,7 +64,10 @@ class CustomRouter(object):
         # else:
         # 2) Advanced cost function that combines duration with averaging
         # isVictim = ??? random x percent (how many % routes have been victomized before)
-        isVictim = cls.explorationPercentage > random()
+
+        # isVictim = cls.explorationPercentage > random()
+        isVictim = False
+
         if isVictim:
             victimizationChoice = 1
         else:

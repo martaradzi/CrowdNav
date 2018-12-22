@@ -20,7 +20,7 @@ kafkaTopicRouting = "crowd-nav-routing"
 kafkaCommandsTopic = "crowd-nav-commands"
 
 # True if we want to use the SUMO GUI (always of in parallel mode)
-sumoUseGUI = True  # False
+sumoUseGUI = False  # False
 
 # The network config (links to the net) we use for our simulation
 sumoConfig = "./app/map/eichstaedt.sumo.cfg"
@@ -29,7 +29,7 @@ sumoConfig = "./app/map/eichstaedt.sumo.cfg"
 sumoNet = "./app/map/eichstaedt.net.xml"
 
 # Initial wait time before publishing overheads
-initialWaitTicks = 200
+initialWaitTicks = 1
 
 # the total number of cars we use in our simulation
 totalCarCounter = 600
@@ -43,4 +43,7 @@ smartCarPercentage = 1
 processID = 0
 parallelMode = False
 
-epos_mode = True
+epos_mode_read = False
+epos_mode_write = False
+
+random_seed = 1

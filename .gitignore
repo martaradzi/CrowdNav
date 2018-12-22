@@ -13,3 +13,5 @@ SUMOS.egg-info/*
 spark/project/*
 *.iml
 !/data/placeholder
+.ipynb_checkpoints
+CrowdNav.egg-info

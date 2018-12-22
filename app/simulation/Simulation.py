@@ -49,7 +49,8 @@ class Simulation(object):
         # apply the configuration from the json file
         cls.applyFileConfig()
         CarRegistry.applyCarCounter()
-        CarRegistry.selectOptimalRoutes()
+        if Config.epos_mode_read:
+            CarRegistry.selectOptimalRoutes()
         cls.loop()
 
     @classmethod
@@ -60,6 +61,10 @@ class Simulation(object):
         # start listening to all cars that arrived at their target
         traci.simulation.subscribe((tc.VAR_ARRIVED_VEHICLES_IDS,))
         while 1:
+
+            if len(CarRegistry.cars) == 0:
+                print("simulation finished")
+                return
             # Do one simulation step
             cls.tick += 1
             traci.simulationStep()
@@ -77,11 +82,11 @@ class Simulation(object):
 
             timeBeforeCarProcess = current_milli_time()
             # let the cars process this step
-            CarRegistry.processTick(cls.tick)
+            # CarRegistry.processTick(cls.tick)
             # log time it takes for routing
-            msg = dict()
-            msg["duration"] = current_milli_time() - timeBeforeCarProcess
-            RTXForword.publish(msg, Config.kafkaTopicRouting)
+            # msg = dict()
+            # msg["duration"] = current_milli_time() - timeBeforeCarProcess
+            # RTXForword.publish(msg, Config.kafkaTopicRouting)
 
             # if we enable this we get debug information in the sumo-gui using global traveltime
             # should not be used for normal running, just for debugging

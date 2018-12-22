@@ -33,7 +33,7 @@ class CarRegistry(object):
     @classmethod
     def selectOptimalRoutes(cls):
 
-        with open('./selected-plans.csv', 'r') as results:
+        with open('./data/selected_plans/selected-plans.csv', 'r') as results:
             line_id = 1
             for line in results:
                 if line_id == 41:
@@ -43,10 +43,11 @@ class CarRegistry(object):
 
         for i in range(0, cls.carIndexCounter):
             c = cls.cars["car-" + str(i)]
-            with open('./data/agent_' + str(i) + '.routes', 'r') as plans_file:
+            with open('./data/routes/agent_' + str(i) + '.routes', 'r') as plans_file:
                 plans=plans_file.readlines()
             selected_route = plans[res[i]].replace('\r', '').replace('\n', '').split(",")
-            c.changeRoute(selected_route)
+            c.change_route(selected_route)
+            c.change_preference(res[i])
 
     @classmethod
     def applyCarCounter(cls):
