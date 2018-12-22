@@ -34,14 +34,16 @@ def start(processID, parallelMode,useGUI,seed):
 
     Config.kafkaTopicTrips = "crowd-nav-trips-" + str(processID)
     Config.kafkaCommandsTopic = "crowd-nav-commands-" + str(processID)
+    Config.kafkaTopicRouting = Config.kafkaTopicRouting + "-" + str(processID)
 
     info('#####################################', Fore.CYAN)
     info('#      Starting CrowdNav v0.2       #', Fore.CYAN)
     info('#####################################', Fore.CYAN)
     info('# Configuration:', Fore.YELLOW)
-    info('# Kafka-Host   -> ' + Config.kafkaHost, Fore.YELLOW)
-    info('# Kafka-Topic1 -> ' + Config.kafkaTopicTrips, Fore.YELLOW)
-    info('# Kafka-Topic2 -> ' + Config.kafkaTopicPerformance, Fore.YELLOW)
+    info('# Kafka-Host    -> ' + Config.kafkaHost, Fore.YELLOW)
+    info('# Publishing to -> ' + Config.kafkaTopicTrips, Fore.YELLOW)
+    info('# Publishing to -> ' + Config.kafkaTopicRouting, Fore.YELLOW)
+    info('# Listening on  -> ' + Config.kafkaCommandsTopic, Fore.YELLOW)
 
     # init sending updates to kafka and getting commands from there
     if Config.kafkaUpdates or Config.mqttUpdates:

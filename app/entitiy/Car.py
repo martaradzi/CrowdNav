@@ -88,7 +88,7 @@ class Car:
             msg = dict()
             msg["tick"] = tick
             msg["overhead"] = tripOverhead
-            msg["complaint"] = self.generate_complaint(tripOverhead)
+            # msg["complaint"] = self.generate_complaint(tripOverhead)
             msg["minimalCosts"] = minimalCosts
             msg["durationForTrip"] = durationForTrip
             RTXForword.publish(msg, Config.kafkaTopicTrips)
