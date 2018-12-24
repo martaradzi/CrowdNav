@@ -1,6 +1,7 @@
 #
 # Config file for SUMOS
 #
+import os
 
 # should use kafka for config changes (else it uses json file)
 kafkaUpdates = True
@@ -23,10 +24,10 @@ kafkaCommandsTopic = "crowd-nav-commands"
 sumoUseGUI = True  # False
 
 # The network config (links to the net) we use for our simulation
-sumoConfig = "./app/map/eichstaedt.sumo.cfg"
+sumoConfig = os.path.join(os.environ["CROWDNAV"], "app/map/eichstaedt.sumo.cfg")
 
 # The network net we use for our simulation
-sumoNet = "./app/map/eichstaedt.net.xml"
+sumoNet = os.path.join(os.environ["CROWDNAV"], "app/map/eichstaedt.net.xml")
 
 # Initial wait time before publishing overheads
 initialWaitTicks = 200

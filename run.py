@@ -1,7 +1,10 @@
-from app import Boot
 import sys
 import random
 import argparse
+import os
+
+os.environ["CROWDNAV"] = '/home/erik/research/DARTS-CORRECTBRANCH/CrowdNav'
+from app import Boot
 
 # Handle arguments
 parser = argparse.ArgumentParser(description='Executes CrowdNav application.')
