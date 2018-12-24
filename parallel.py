@@ -6,7 +6,7 @@ import sys
 import argparse
 import os
 
-os.environ["CROWDNAV"] = '/home/erik/research/DARTS-CORRECTBRANCH/CrowdNav'
+os.environ["CROWDNAV"] = '.'
 from app import Boot
 
 # Handle arguments
