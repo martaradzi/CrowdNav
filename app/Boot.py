@@ -8,6 +8,7 @@ from app.logging import info
 from app.routing.CustomRouter import CustomRouter
 from app.network.Network import Network
 from app.simulation.Simulation import Simulation
+from app.entitiy.CarRegistry import CarRegistry
 from streaming import RTXForword
 from colorama import Fore
 from sumo import SUMOConnector, SUMODependency
@@ -19,7 +20,7 @@ import random
 
 
 # uuid4()
-def start(processID, parallelMode,useGUI,seed):
+def start(processID, parallelMode,useGUI,seed, configuration, car_count):
     """ main entry point into the application """
 
     # Seed application
@@ -44,6 +45,9 @@ def start(processID, parallelMode,useGUI,seed):
     info('# Publishing to -> ' + Config.kafkaTopicTrips, Fore.YELLOW)
     info('# Publishing to -> ' + Config.kafkaTopicRouting, Fore.YELLOW)
     info('# Listening on  -> ' + Config.kafkaCommandsTopic, Fore.YELLOW)
+
+    apply_car_count(car_count)
+    apply_starting_configuration(configuration)
 
     # init sending updates to kafka and getting commands from there
     if Config.kafkaUpdates or Config.mqttUpdates:
@@ -71,3 +75,32 @@ def start(processID, parallelMode,useGUI,seed):
     traci.close()
     sys.stdout.flush()
     return None
+
+
+def apply_starting_configuration(conf):
+    if "exploration_percentage" in conf:
+        CustomRouter.explorationPercentage = conf["exploration_percentage"]
+        info("# Setting victimsPercentage: " + str(conf["exploration_percentage"]), Fore.YELLOW)
+    if "route_random_sigma" in conf:
+        CustomRouter.routeRandomSigma = conf["route_random_sigma"]
+        info("# Setting routeRandomSigma: " + str(conf["route_random_sigma"]), Fore.YELLOW)
+    if "max_speed_and_length_factor" in conf:
+        CustomRouter.maxSpeedAndLengthFactor = conf["max_speed_and_length_factor"]
+        info("# Setting maxSpeedAndLengthFactor: " + str(conf["max_speed_and_length_factor"]), Fore.YELLOW)
+    if "average_edge_duration_factor" in conf:
+        CustomRouter.averageEdgeDurationFactor = conf["average_edge_duration_factor"]
+        info("# Setting averageEdgeDurationFactor: " + str(conf["average_edge_duration_factor"]), Fore.YELLOW)
+    if "freshness_update_factor" in conf:
+        CustomRouter.freshnessUpdateFactor = conf["freshness_update_factor"]
+        info("# Setting freshnessUpdateFactor: " + str(conf["freshness_update_factor"]), Fore.YELLOW)
+    if "freshness_cut_off_value" in conf:
+        CustomRouter.freshnessCutOffValue = conf["freshness_cut_off_value"]
+        info("# Setting freshnessCutOffValue: " + str(conf["freshness_cut_off_value"]), Fore.YELLOW)
+    if "re_route_every_ticks" in conf:
+        CustomRouter.reRouteEveryTicks = conf["re_route_every_ticks"]
+        info("# Setting reRouteEveryTicks: " + str(conf["re_route_every_ticks"]), Fore.YELLOW)
+
+
+def apply_car_count(car_count):
+    info("# Car count is " + str(car_count), Fore.YELLOW)
+    CarRegistry.totalCarCounter = car_count

@@ -43,7 +43,8 @@ class Car:
         # the driver imperfection in handling the car
         self.imperfection = min(0.9, max(0.1, random.gauss(0.5, 0.5)))
         # is this car a smart car
-        self.smartCar = id <= Config.smartCarCounter
+        self.smartCar = True
+        # self.smartCar = id <= Config.smartCarCounter
         # old way of determining smart cars:
         # self.smartCar = Config.smartCarPercentage > random.random()
         # number of ticks since last reroute / arrival
@@ -57,7 +58,7 @@ class Car:
         # add a round to the car
         self.rounds += 1
         self.lastRerouteCounter = 0
-        if tick > Config.initialWaitTicks and self.smartCar:  # as we ignore the first 1000 ticks for this
+        if self.smartCar: # all cars are smart!
             # add a route to the global registry
             CarRegistry.totalTrips += 1
             # add the duration for this route to the global tripAverage

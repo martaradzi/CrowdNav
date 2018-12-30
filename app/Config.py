@@ -6,7 +6,7 @@ import os
 # should use kafka for config changes (else it uses json file)
 kafkaUpdates = True
 # the kafka host we want to send our messages to
-kafkaHost = "exp1:9092"
+kafkaHost = "kafka:9092"
 
 mqttUpdates = False
 mqttHost = "localhost"
@@ -30,16 +30,16 @@ sumoConfig = os.path.join(os.environ["CROWDNAV"], "app/map/eichstaedt.sumo.cfg")
 sumoNet = os.path.join(os.environ["CROWDNAV"], "app/map/eichstaedt.net.xml")
 
 # Initial wait time before publishing overheads
-initialWaitTicks = 200
+# initialWaitTicks = 10
 
 # the total number of cars we use in our simulation
-totalCarCounter = 750
+# totalCarCounter = 750
 
-smartCarCounter = 750
+#smartCarCounter = 500
 
 # percentage of cars that are smart
 # DEPRECATED - USE smartCarCounter instead
-smartCarPercentage = 0.2
+# smartCarPercentage = 0.2
 
 
 
