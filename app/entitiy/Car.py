@@ -193,7 +193,9 @@ class Car:
     def create_output_files(self, cost, route, all_routes, preferred = False):
         # print "new route for " + str(self.id) + " with preference " + self.driver_preference
         agent_ind = self.id[self.id.find("-")+1:]
-        with open('./data/plans/agent_' + agent_ind + '.plans', 'ab') as epos_file, open('./data/routes/agent_' + agent_ind + '.routes', 'ab') as routes_file:
+
+        with open('datasets/plans/agent_' + agent_ind + '.plans', 'ab') as epos_file, \
+                open('datasets/routes/agent_' + agent_ind + '.routes', 'ab') as routes_file:
 
             epos_writer = csv.writer(epos_file, dialect='excel')
             routes_writer = csv.writer(routes_file, dialect='excel')

@@ -15,3 +15,5 @@ spark/project/*
 !/data/placeholder
 .ipynb_checkpoints
 CrowdNav.egg-info
+output/*
+datasets/*

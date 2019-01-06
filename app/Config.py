@@ -3,21 +3,11 @@
 #
 
 # should use kafka for config changes (else it uses json file)
-kafkaUpdates = True
-# the kafka host we want to send our messages to
-kafkaHost = "kafka:9092"
+kafkaUpdates = False
 
 mqttUpdates = False
 mqttHost = "localhost"
 mqttPort = "1883"
-
-# the topic we send the kafka messages to
-kafkaTopicTrips = "crowd-nav-trips"
-kafkaTopicPerformance = "crowd-nav-performance"
-kafkaTopicRouting = "crowd-nav-routing"
-
-# where we receive system changes
-kafkaCommandsTopic = "crowd-nav-commands"
 
 # True if we want to use the SUMO GUI (always of in parallel mode)
 sumoUseGUI = False  # False
@@ -43,7 +33,9 @@ smartCarPercentage = 1
 processID = 0
 parallelMode = False
 
-epos_mode_read = False
-epos_mode_write = False
+epos_mode_read = True
+epos_mode_write = True
 
 random_seed = 1
+
+epos_jar_path = "/Users/gerostat/Documents/research/EPOS CROWDNAV/release-0.0.1/epos-tutorial.jar"

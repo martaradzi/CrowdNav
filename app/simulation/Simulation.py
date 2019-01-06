@@ -1,7 +1,9 @@
 import json
+import os, shutil
 import traci
 import traci.constants as tc
 from app.network.Network import Network
+import subprocess
 
 from app.streaming import RTXForword
 from colorama import Fore
@@ -42,15 +44,50 @@ class Simulation(object):
         except:
             pass
 
+
+    @staticmethod
+    def get_output_folder_for_latest_EPOS_run():
+        current_max = 0
+        for name in os.listdir("output"):
+            output_number = int(name.split("_")[1])
+            if output_number > current_max:
+                current_max = output_number
+        output_folder_for_latest_EPOS_run = "output/plans_" + str(current_max)
+        print "latest EPOS output in " + output_folder_for_latest_EPOS_run
+        return output_folder_for_latest_EPOS_run
+
+    @staticmethod
+    def create_dataset_folders_if_not_present():
+        if not os.path.exists("datasets"):
+            os.makedirs("datasets")
+
+        if os.path.exists("datasets/plans"):
+            shutil.rmtree("datasets/plans")
+        os.makedirs("datasets/plans")
+
+        if os.path.exists("datasets/routes"):
+            shutil.rmtree("datasets/routes")
+        os.makedirs("datasets/routes")
+
     @classmethod
     def start(cls):
+
+        Simulation.create_dataset_folders_if_not_present()
+
         """ start the simulation """
         info("# Start adding initial cars to the simulation", Fore.MAGENTA)
         # apply the configuration from the json file
         cls.applyFileConfig()
         CarRegistry.applyCarCounter()
+
+        p = subprocess.Popen(["java", "-jar", Config.epos_jar_path])
+        print "Waiting for EPOS"
+        p.communicate()
+        print "EPOS run completed!"
+
         if Config.epos_mode_read:
-            CarRegistry.selectOptimalRoutes()
+            CarRegistry.selectOptimalRoutes(Simulation.get_output_folder_for_latest_EPOS_run())
+
         cls.loop()
 
     @classmethod
@@ -68,13 +105,6 @@ class Simulation(object):
             # Do one simulation step
             cls.tick += 1
             traci.simulationStep()
-
-            # Log tick duration to kafka
-            duration = current_milli_time() - cls.lastTick
-            cls.lastTick = current_milli_time()
-            msg = dict()
-            msg["duration"] = duration
-            RTXForword.publish(msg, Config.kafkaTopicPerformance)
 
             # Check for removed cars and re-add them into the system
             for removedCarId in traci.simulation.getSubscriptionResults()[122]:

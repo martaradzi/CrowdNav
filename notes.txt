@@ -2,3 +2,8 @@
 =============
 Compare baseline (no EPOS) with EPOS for 600 cars with a single destination.
 
+Automatic execution of EPOS
+===========================
+1. Copy files to EPOS `datasets` directory
+2. Invoke IEPOSExperiment from Python, wait for results.
+3. Read the optimal configuration from the output of EPOS

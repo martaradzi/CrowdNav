@@ -31,9 +31,9 @@ class CarRegistry(object):
     # @todo on shortest path possible -> minimal value
 
     @classmethod
-    def selectOptimalRoutes(cls):
+    def selectOptimalRoutes(cls, output_folder_for_latest_run):
 
-        with open('./data/selected_plans/selected-plans.csv', 'r') as results:
+        with open(output_folder_for_latest_run + '/selected-plans.csv', 'r') as results:
             line_id = 1
             for line in results:
                 if line_id == 41:
