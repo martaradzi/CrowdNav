@@ -43,7 +43,7 @@ class CarRegistry(object):
 
         for i in range(0, cls.carIndexCounter):
             c = cls.cars["car-" + str(i)]
-            with open('./data/routes/agent_' + str(i) + '.routes', 'r') as plans_file:
+            with open('datasets/routes/agent_' + str(i) + '.routes', 'r') as plans_file:
                 plans=plans_file.readlines()
             selected_route = plans[res[i]].replace('\r', '').replace('\n', '').split(",")
             c.change_route(selected_route)
