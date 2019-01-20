@@ -17,6 +17,7 @@ import time
 
 # get the current system time
 from app.routing.RoutingEdge import RoutingEdge
+from app.logging import CSVLogger
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -72,6 +73,8 @@ class Simulation(object):
     @classmethod
     def start(cls):
 
+        CSVLogger.logEvent("edges", [edge.id for edge in Network.routingEdges])
+
         Simulation.create_dataset_folders_if_not_present()
 
         """ start the simulation """
@@ -80,12 +83,11 @@ class Simulation(object):
         cls.applyFileConfig()
         CarRegistry.applyCarCounter()
 
-        p = subprocess.Popen(["java", "-jar", Config.epos_jar_path])
-        print "Waiting for EPOS"
-        p.communicate()
-        print "EPOS run completed!"
-
         if Config.epos_mode_read:
+            p = subprocess.Popen(["java", "-jar", Config.epos_jar_path])
+            print "Waiting for EPOS"
+            p.communicate()
+            print "EPOS run completed!"
             CarRegistry.selectOptimalRoutes(Simulation.get_output_folder_for_latest_EPOS_run())
 
         cls.loop()
@@ -127,6 +129,9 @@ class Simulation(object):
             # 3)     traci.edge.adaptTraveltime(e.id, (cls.tick-e.lastDurationUpdateTick)) # how old the data is
 
             # real time update of config if we are not in kafka mode
+
+            CSVLogger.logEvent("edges", [cls.tick] + [traci.edge.getLastStepVehicleNumber(edge.id)*Config.vehicle_length / edge.length for edge in Network.routingEdges])
+
             if (cls.tick % 10) == 0:
                 if Config.kafkaUpdates is False and Config.mqttUpdates is False:
                     # json mode

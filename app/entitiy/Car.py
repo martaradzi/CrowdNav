@@ -49,8 +49,6 @@ class Car:
         # number of ticks since last reroute / arrival
         self.lastRerouteCounter = 0
 
-        self.vehicle_length = 5
-
         # random_for_choosing = random.SystemRandom()
         # self.driver_preference = random_for_choosing.choice(["balanced", "min_length", "max_speed"])
         # self.driver_preference = "balanced"
@@ -302,6 +300,8 @@ class Car:
         streets_for_interval = {}
         all_streets.append(streets_for_interval)
 
+        vehicle_length = Config.vehicle_length
+
         # print "--- NEW ROUTE ---"
         for m in meta:
             # print "### NEW STREET ###"
@@ -323,7 +323,7 @@ class Car:
                 # print "surplus_time: " + str(surplus_time)
                 # print "new time for interval: " + str(time)
                 percentage = time/interval
-                occupancy = self.vehicle_length*percentage/length
+                occupancy = vehicle_length*percentage/length
                 if occupancy < 0:
                     raise RuntimeError
 
@@ -335,7 +335,7 @@ class Car:
                     # print "surplus_time: " + str(surplus_time)
                     streets_for_interval = {}
                     all_streets.append(streets_for_interval)
-                    occupancy = self.vehicle_length/length
+                    occupancy = vehicle_length/length
                     if occupancy < 0:
                         raise RuntimeError
                     streets_for_interval[m["edgeID"]] = occupancy
@@ -346,7 +346,7 @@ class Car:
                 streets_for_interval = {}
                 all_streets.append(streets_for_interval)
                 percentage_surplus = surplus_time/interval
-                occupancy = self.vehicle_length*percentage_surplus/length
+                occupancy = vehicle_length*percentage_surplus/length
                 # print "occupancy3 : " + str(occupancy)
                 if occupancy < 0:
                     raise RuntimeError
@@ -355,7 +355,7 @@ class Car:
             else:
                 # print "%%% NO SURPLUS DETECTED %%%"
                 percentage = time/interval
-                occupancy = self.vehicle_length*percentage/length
+                occupancy = vehicle_length*percentage/length
                 if occupancy < 0:
                     raise RuntimeError
                 streets_for_interval[m["edgeID"]] = occupancy

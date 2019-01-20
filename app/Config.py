@@ -39,3 +39,5 @@ epos_mode_write = True
 random_seed = 1
 
 epos_jar_path = "/Users/gerostat/Documents/research/EPOS CROWDNAV/release-0.0.1/epos-tutorial.jar"
+
+vehicle_length = 5
