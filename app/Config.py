@@ -10,7 +10,7 @@ mqttHost = "localhost"
 mqttPort = "1883"
 
 # True if we want to use the SUMO GUI (always of in parallel mode)
-sumoUseGUI = False  # False
+sumoUseGUI = True  # False
 
 # The network config (links to the net) we use for our simulation
 sumoConfig = "./app/map/eichstaedt.sumo.cfg"
@@ -27,7 +27,7 @@ totalCarCounter = 600
 # percentage of cars that are smart
 smartCarPercentage = 1
 
-
+simulation_horizon = 1000
 
 # runtime dependent variable
 processID = 0
@@ -41,3 +41,5 @@ random_seed = 1
 epos_jar_path = "/Users/gerostat/Documents/research/EPOS CROWDNAV/release-0.0.1/epos-tutorial.jar"
 
 vehicle_length = 5
+
+planning_period = 200

@@ -75,7 +75,7 @@ class Car:
             # CSVLogger.logEvent("arrived", [tick, self.sourceID, self.targetID,
             #                                durationForTip, self.id,self.currentRouterResult.isVictim])
             # log the overrhead values
-            minimalCosts = CustomRouter.minimalRoute(self.sourceID, self.targetID, None, None).totalCost
+            minimalCosts = CustomRouter.minimalRoute(self.sourceID, self.targetID).totalCost
             tripOverhead = durationForTrip / minimalCosts / 1.1  # 1.6 is to correct acceleration and deceleration
             # when the distance is very short, we have no overhead
             if durationForTrip < 10:
@@ -107,14 +107,14 @@ class Car:
             #     overheads = csv.writer(overheads, dialect='excel')
             #     overheads.writerow([tripOverhead])
 
-            self.disabled = True
-            del CarRegistry.cars[self.id]
+            # self.disabled = True
+            # del CarRegistry.cars[self.id]
 
         # if car is still enabled, restart it in the simulation
         if self.disabled is False:
             # add a round to the car
             self.rounds += 1
-            self.addToSimulation(tick)
+            self.addToSimulation(tick, False)
 
     def __createNewRoute(self, tick):
         """ creates a new route to a random target and uploads this route to SUMO """
@@ -129,56 +129,19 @@ class Car:
         # self.currentRouterResult = CustomRouter.route(self.sourceID, self.targetID, tick, self)
 
         if self.driver_preference=="min_length":
-            self.currentRouterResult = CustomRouter.route_by_min_length(self.sourceID, self.targetID, tick, self)
+            self.currentRouterResult = CustomRouter.route_by_min_length(self.sourceID, self.targetID)
         elif self.driver_preference=="max_speed":
-            self.currentRouterResult = CustomRouter.route_by_max_speed(self.sourceID, self.targetID, tick, self)
+            self.currentRouterResult = CustomRouter.route_by_max_speed(self.sourceID, self.targetID)
         else:
-            self.currentRouterResult = CustomRouter.minimalRoute(self.sourceID, self.targetID, tick, self)
-
-        ######################################
-        ##############   EPOS   ##############
-        ######################################
-
-        if Config.epos_mode_write:
-
-            router_res_length = CustomRouter.route_by_min_length(self.sourceID, self.targetID, tick, self)
-            if len(router_res_length.route) > 0:
-                self.create_output_files(
-                    # router_res_length.totalCost,
-                    Car.history_prefs[self.id]["min_length"],
-                    router_res_length.route,
-                    self.find_occupancy_for_route(router_res_length.meta))
-                    # self.driver_preference == "min_length")
-
-            router_res_speeds = CustomRouter.route_by_max_speed(self.sourceID, self.targetID, tick, self)
-            if len(router_res_speeds.route) > 0:
-                self.create_output_files(
-                    # CustomRouter.calculate_length_of_route(router_res_speeds.route),
-                    Car.history_prefs[self.id]["max_speed"],
-                    router_res_speeds.route,
-                    self.find_occupancy_for_route(router_res_speeds.meta))
-                    # self.driver_preference == "max_speed")
-
-            router_res_length_and_speeds = CustomRouter.minimalRoute(self.sourceID, self.targetID, tick, self)
-            if len(router_res_length_and_speeds.route) > 0:
-                self.create_output_files(
-                    # CustomRouter.calculate_length_of_route(router_res_length_and_speeds.route),
-                    Car.history_prefs[self.id]["balanced"],
-                    router_res_length_and_speeds.route,
-                    self.find_occupancy_for_route(router_res_length_and_speeds.meta))
-                    # self.driver_preference == "balanced")
-
-        ######################################
-        ##############   EPOS   ##############
-        ######################################
+            self.currentRouterResult = CustomRouter.minimalRoute(self.sourceID, self.targetID)
 
         if len(self.currentRouterResult.route) > 0:
             traci.route.add(self.currentRouteID, self.currentRouterResult.route)
 
             # just for debugging
-            if self.id == "car-0" or self.id == "car-1" or self.id == "car-599":
-                print 'car ' + str(self.id) + " with source and destination " + str(self.sourceID), ", " + str(self.targetID)
-                print 'car ' + str(self.id) + " with route " + str(self.currentRouterResult.route)
+            # if self.id == "car-0" or self.id == "car-1" or self.id == "car-599":
+            #     print 'car ' + str(self.id) + " with source and destination " + str(self.sourceID), ", " + str(self.targetID)
+            #     print 'car ' + str(self.id) + " with route " + str(self.currentRouterResult.route)
 
             # set color to red
             return self.currentRouteID
@@ -188,9 +151,55 @@ class Car:
             # recursion aka. try again as this should work!
             return self.__createNewRoute(tick)
 
-    def create_output_files(self, cost, route, all_routes, preferred = False):
+    def create_epos_output_files_based_on_current_location(self, tick, agent_ind):
+        # currentEdgeID = traci.vehicle.getRoadID(self.id)
+        # if currentEdgeID not in Network.edgeIds:
+        #     currentEdgeID = traci.vehicle.getRoute(self.id)[traci.vehicle.getRouteIndex(self.id)+1]
+        route = traci.vehicle.getRoute(self.id)
+        previousEdgeID = route[traci.vehicle.getRouteIndex(self.id)]
+        previousNodeID = Network.getEdgeIDsToNode(previousEdgeID).getID()
+
+        if previousNodeID == self.targetID:
+            print self.id + "\tis already reaching its destination and won't be considered in the optimization."
+            return False
+
+        self.create_epos_output_files(previousNodeID, self.targetID, tick, agent_ind)
+        return True
+
+    def create_epos_output_files(self, sourceID, targetID, tick, agent_ind):
+
+        router_res_length = CustomRouter.route_by_min_length(sourceID, targetID)
+        if len(router_res_length.route) > 0:
+            self.create_output_files(
+                # router_res_length.totalCost,
+                Car.history_prefs[self.id]["min_length"],
+                router_res_length.route,
+                self.find_occupancy_for_route(router_res_length.meta),
+                agent_ind)
+            # self.driver_preference == "min_length")
+
+        router_res_speeds = CustomRouter.route_by_max_speed(sourceID, targetID)
+        if len(router_res_speeds.route) > 0:
+            self.create_output_files(
+                # CustomRouter.calculate_length_of_route(router_res_speeds.route),
+                Car.history_prefs[self.id]["max_speed"],
+                router_res_speeds.route,
+                self.find_occupancy_for_route(router_res_speeds.meta),
+                agent_ind)
+            # self.driver_preference == "max_speed")
+
+        router_res_length_and_speeds = CustomRouter.minimalRoute(sourceID, targetID)
+        if len(router_res_length_and_speeds.route) > 0:
+            self.create_output_files(
+                # CustomRouter.calculate_length_of_route(router_res_length_and_speeds.route),
+                Car.history_prefs[self.id]["balanced"],
+                router_res_length_and_speeds.route,
+                self.find_occupancy_for_route(router_res_length_and_speeds.meta),
+                agent_ind)
+            # self.driver_preference == "balanced")
+
+    def create_output_files(self, cost, route, all_routes, agent_ind):
         # print "new route for " + str(self.id) + " with preference " + self.driver_preference
-        agent_ind = self.id[self.id.find("-")+1:]
 
         with open('datasets/plans/agent_' + agent_ind + '.plans', 'ab') as epos_file, \
                 open('datasets/routes/agent_' + agent_ind + '.routes', 'ab') as routes_file:
@@ -200,9 +209,7 @@ class Car:
             routes_writer.writerow(route)
 
             # epos_writer.writerow([edge.id for edge in Network.routingEdges])
-
             # cost = 0.8 * cost if preferred else cost
-
             # epos_file.write(str(cost) + ":")
             # epos_writer.writerow([self.vehicle_length/edge.length if edge.id in route else 0 for edge in Network.routingEdges])
 
@@ -228,6 +235,8 @@ class Car:
             self.lastRerouteCounter = 0
             if self.smartCar:
                 try:
+                    print tick
+                    print self.id
                     oldRoute = self.currentRouterResult.route
                     currentEdgeID = traci.vehicle.getRoadID(self.id)
                     nextNodeID = Network.getEdgeIDsToNode(currentEdgeID).getID()
@@ -245,31 +254,44 @@ class Car:
         if roadID != self.currentEdgeID and self.smartCar:
             if self.currentEdgeBeginTick is not None:
                 CustomRouter.applyEdgeDurationToAverage(self.currentEdgeID, tick - self.currentEdgeBeginTick, tick)
-                # CSVLogger.logEvent("edge", [tick, self.currentEdgeID,
-                #                             tick - self.currentEdgeBeginTick, self.id])
-                # log to kafak
-                # msg = dict()
-                # msg["tick"] = tick
-                # msg["edgeID"] = self.currentEdgeID,
-                # msg["duration"] = tick - self.currentEdgeBeginTick
-            # print("changed route to: " + roadID)
             self.currentEdgeBeginTick = tick
             self.currentEdgeID = roadID
             pass
 
-    def change_route(self, route):
-        self.currentRouterResult.route = route
-        traci.vehicle.setRoute(self.id, self.currentRouterResult.route)
+    def change_route(self, route, first_invocation):
+        # print self.currentRouterResult.route
+        # print route
+        if first_invocation:
+            self.currentRouterResult.route = route
+            traci.vehicle.setRoute(self.id, self.currentRouterResult.route)
+        else:
+            currentEdgeID = traci.vehicle.getRoadID(self.id)
+            if currentEdgeID not in Network.edgeIds:
+                currentEdgeID = traci.vehicle.getRoute(self.id)[traci.vehicle.getRouteIndex(self.id)]
+            # print currentEdgeID
+            # print "**************"
+            try:
+                currentRoute = self.currentRouterResult.route
+                self.currentRouterResult.route = route
+                traci.vehicle.setRoute(self.id, [currentEdgeID] + self.currentRouterResult.route)
+            except Exception as e:
+                self.currentRouterResult.route = currentRoute
+                print("error in changing route " + str(e))
 
     def change_preference(self, pref_id):
         self.driver_preference = Car.preferences_list[pref_id]
 
-    def addToSimulation(self, tick):
+    def addToSimulation(self, tick, epos_prepare_inputs):
         """ adds this car to the simulation through the traci API """
         self.currentRouteBeginTick = tick
         try:
             traci.vehicle.add(self.id, self.__createNewRoute(tick), tick, -4, -3)
             traci.vehicle.subscribe(self.id, (tc.VAR_ROAD_ID,))
+
+            if Config.epos_mode_write and epos_prepare_inputs:
+                agent_ind = self.id[self.id.find("-")+1:]
+                self.create_epos_output_files(self.sourceID, self.targetID, tick, agent_ind)
+
             # ! currently disabled for performance reasons
             # traci.vehicle.setAccel(self.id, self.acceleration)
             # traci.vehicle.setDecel(self.id, self.deceleration)

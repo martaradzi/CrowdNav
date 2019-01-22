@@ -41,7 +41,7 @@ class CustomRouter(object):
                                  'lanes': len(edge.lanes), 'edgeID': edge.id})
 
     @classmethod
-    def minimalRoute(cls, fr, to, tick, car):
+    def minimalRoute(cls, fr, to):
         """creates a minimal route based on length / speed  """
         cost_func = lambda u, v, e, prev_e: e['length'] / e['maxSpeed']
         route = find_path(cls.graph, fr, to, cost_func=cost_func)
@@ -119,14 +119,14 @@ class CustomRouter(object):
             return 1
 
     @classmethod
-    def route_by_max_speed(cls, fr, to, tick, car):
+    def route_by_max_speed(cls, fr, to):
         """ creates a route from the f(node) to the t(node) """
         cost_func = lambda u, v, e, prev_e: (1 / e['maxSpeed'])
         route = find_path(cls.graph, fr, to, cost_func=cost_func)
         return RouterResult(route, False)
 
     @classmethod
-    def route_by_min_length(cls, fr, to, tick, car):
+    def route_by_min_length(cls, fr, to):
         """ creates a route from the f(node) to the t(node) """
         cost_func = lambda u, v, e, prev_e: (e['length'])
         route = find_path(cls.graph, fr, to, cost_func=cost_func)

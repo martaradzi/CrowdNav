@@ -1,9 +1,7 @@
 import json
-import os, shutil
 import traci
 import traci.constants as tc
 from app.network.Network import Network
-import subprocess
 
 from app.streaming import RTXForword
 from colorama import Fore
@@ -18,6 +16,8 @@ import time
 # get the current system time
 from app.routing.RoutingEdge import RoutingEdge
 from app.logging import CSVLogger
+
+from app.Util import prepare_epos_input_data_folders
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -45,37 +45,12 @@ class Simulation(object):
         except:
             pass
 
-
-    @staticmethod
-    def get_output_folder_for_latest_EPOS_run():
-        current_max = 0
-        for name in os.listdir("output"):
-            output_number = int(name.split("_")[1])
-            if output_number > current_max:
-                current_max = output_number
-        output_folder_for_latest_EPOS_run = "output/plans_" + str(current_max)
-        print "latest EPOS output in " + output_folder_for_latest_EPOS_run
-        return output_folder_for_latest_EPOS_run
-
-    @staticmethod
-    def create_dataset_folders_if_not_present():
-        if not os.path.exists("datasets"):
-            os.makedirs("datasets")
-
-        if os.path.exists("datasets/plans"):
-            shutil.rmtree("datasets/plans")
-        os.makedirs("datasets/plans")
-
-        if os.path.exists("datasets/routes"):
-            shutil.rmtree("datasets/routes")
-        os.makedirs("datasets/routes")
-
     @classmethod
     def start(cls):
 
         CSVLogger.logEvent("edges", [edge.id for edge in Network.routingEdges])
 
-        Simulation.create_dataset_folders_if_not_present()
+        prepare_epos_input_data_folders()
 
         """ start the simulation """
         info("# Start adding initial cars to the simulation", Fore.MAGENTA)
@@ -83,12 +58,12 @@ class Simulation(object):
         cls.applyFileConfig()
         CarRegistry.applyCarCounter()
 
-        if Config.epos_mode_read:
-            p = subprocess.Popen(["java", "-jar", Config.epos_jar_path])
-            print "Waiting for EPOS"
-            p.communicate()
-            print "EPOS run completed!"
-            CarRegistry.selectOptimalRoutes(Simulation.get_output_folder_for_latest_EPOS_run())
+        CarRegistry.replaceAll("conf/epos.properties", "numAgents=", "numAgents=" + str(Config.totalCarCounter))
+
+        cars_to_indexes = {}
+        for i in range(Config.totalCarCounter):
+            cars_to_indexes["car-" + str(i)] = i
+        CarRegistry.run_epos_apply_results(True, cars_to_indexes)
 
         cls.loop()
 
@@ -102,8 +77,9 @@ class Simulation(object):
         while 1:
 
             if len(CarRegistry.cars) == 0:
-                print("simulation finished")
+                print("all cars reached their destinations")
                 return
+
             # Do one simulation step
             cls.tick += 1
             traci.simulationStep()
@@ -111,24 +87,6 @@ class Simulation(object):
             # Check for removed cars and re-add them into the system
             for removedCarId in traci.simulation.getSubscriptionResults()[122]:
                 CarRegistry.findById(removedCarId).setArrived(cls.tick)
-
-            timeBeforeCarProcess = current_milli_time()
-            # let the cars process this step
-            # CarRegistry.processTick(cls.tick)
-            # log time it takes for routing
-            # msg = dict()
-            # msg["duration"] = current_milli_time() - timeBeforeCarProcess
-            # RTXForword.publish(msg, Config.kafkaTopicRouting)
-
-            # if we enable this we get debug information in the sumo-gui using global traveltime
-            # should not be used for normal running, just for debugging
-            # if (cls.tick % 10) == 0:
-            # for e in Network.routingEdges:
-            # 1)     traci.edge.adaptTraveltime(e.id, 100*e.averageDuration/e.predictedDuration)
-            #     traci.edge.adaptTraveltime(e.id, e.averageDuration)
-            # 3)     traci.edge.adaptTraveltime(e.id, (cls.tick-e.lastDurationUpdateTick)) # how old the data is
-
-            # real time update of config if we are not in kafka mode
 
             CSVLogger.logEvent("edges", [cls.tick] + [traci.edge.getLastStepVehicleNumber(edge.id)*Config.vehicle_length / edge.length for edge in Network.routingEdges])
 
@@ -178,14 +136,9 @@ class Simulation(object):
                     CarRegistry.totalTrips) + ")" + " # avgTripOverhead: " + str(
                     CarRegistry.totalTripOverheadAverage))
 
-                # @depricated -> will be removed
-                # # if we are in paralllel mode we end the simulation after 10000 ticks with a result output
-                # if (cls.tick % 10000) == 0 and Config.parallelMode:
-                #     # end the simulation here
-                #     print(str(Config.processID) + " -> Step:" + str(cls.tick) + " # Driving cars: " + str(
-                #         traci.vehicle.getIDCount()) + "/" + str(
-                #         CarRegistry.totalCarCounter) + " # avgTripDuration: " + str(
-                #         CarRegistry.totalTripAverage) + "(" + str(
-                #         CarRegistry.totalTrips) + ")" + " # avgTripOverhead: " + str(
-                #         CarRegistry.totalTripOverheadAverage))
-                #     return
+            if Config.simulation_horizon == cls.tick:
+                print("Simulation horizon reached!")
+                return
+
+            if Config.planning_period == cls.tick:
+                CarRegistry.do_epos_planning(cls.tick)

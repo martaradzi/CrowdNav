@@ -1,6 +1,31 @@
 """ Helper functions """
+import os, shutil, subprocess
 
 
 def addToAverage(totalCount, totalValue, newValue):
     """ simple sliding average calculation """
     return ((1.0 * totalCount * totalValue) + newValue) / (totalCount + 1)
+
+
+def get_output_folder_for_latest_EPOS_run():
+    current_max = 0
+    for name in os.listdir("output"):
+        output_number = int(name.split("_")[1])
+        if output_number > current_max:
+            current_max = output_number
+    output_folder_for_latest_EPOS_run = "output/plans_" + str(current_max)
+    print "latest EPOS output in " + output_folder_for_latest_EPOS_run
+    return output_folder_for_latest_EPOS_run
+
+
+def prepare_epos_input_data_folders():
+    if not os.path.exists("datasets"):
+        os.makedirs("datasets")
+
+    if os.path.exists("datasets/plans"):
+        shutil.rmtree("datasets/plans")
+    os.makedirs("datasets/plans")
+
+    if os.path.exists("datasets/routes"):
+        shutil.rmtree("datasets/routes")
+    os.makedirs("datasets/routes")
