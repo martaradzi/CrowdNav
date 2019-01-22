@@ -18,6 +18,12 @@ def get_output_folder_for_latest_EPOS_run():
     return output_folder_for_latest_EPOS_run
 
 
+def remove_overhead_and_streets_files():
+    if os.path.exists("data/overheads.csv"):
+        os.remove("data/overheads.csv")
+    if os.path.exists("data/streets.csv"):
+        os.remove("data/streets.csv")
+
 def prepare_epos_input_data_folders():
     if not os.path.exists("datasets"):
         os.makedirs("datasets")

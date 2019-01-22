@@ -3,14 +3,40 @@
 #
 
 # should use kafka for config changes (else it uses json file)
+# TODO delete those
+###############################
 kafkaUpdates = False
-
 mqttUpdates = False
 mqttHost = "localhost"
 mqttPort = "1883"
+# Initial wait time before publishing overheads
+initialWaitTicks = 1
+# percentage of cars that are smart
+smartCarPercentage = 1
 
+epos_mode_read = True
+epos_mode_write = True
+
+# runtime dependent variable
+processID = 0
+parallelMode = False
+
+######################################
+####### GENERAL CONFIGURATION ########
+######################################
 # True if we want to use the SUMO GUI (always of in parallel mode)
-sumoUseGUI = True  # False
+sumoUseGUI = False  # False
+
+random_seed = 1
+
+vehicle_length = 5
+
+epos_jar_path = "/Users/gerostat/Documents/research/EPOS CROWDNAV/release-0.0.1/epos-tutorial.jar"
+######################################
+
+######################################
+#### CONFIGURATION OF SIMULATION #####
+######################################
 
 # The network config (links to the net) we use for our simulation
 sumoConfig = "./app/map/eichstaedt.sumo.cfg"
@@ -18,28 +44,28 @@ sumoConfig = "./app/map/eichstaedt.sumo.cfg"
 # The network net we use for our simulation
 sumoNet = "./app/map/eichstaedt.net.xml"
 
-# Initial wait time before publishing overheads
-initialWaitTicks = 1
-
 # the total number of cars we use in our simulation
 totalCarCounter = 600
 
-# percentage of cars that are smart
-smartCarPercentage = 1
+simulation_horizon = 299
 
-simulation_horizon = 1000
+######################################
+##### CONFIGURATION OF PLANNING ######
+######################################
+start_with_epos_optimization = False
 
-# runtime dependent variable
-processID = 0
-parallelMode = False
+planning_period = 100
+planning_steps = 3
+planning_step_horizon = 100
 
-epos_mode_read = True
-epos_mode_write = True
+# double from [0, 1], unfairness + selfishness <= 1, unfairness
+alpha = 0
+# double from [0, 1], unfairness + selfishness <= 1, selfishness or local objective
+beta = 0
 
-random_seed = 1
+######################################
+##### CONFIGURATION OF PLANNING ######
+######################################
 
-epos_jar_path = "/Users/gerostat/Documents/research/EPOS CROWDNAV/release-0.0.1/epos-tutorial.jar"
+adaptation_period = 150
 
-vehicle_length = 5
-
-planning_period = 200

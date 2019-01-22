@@ -10,7 +10,7 @@ from app.network.Network import Network
 from app.routing.CustomRouter import CustomRouter
 from app.routing.RouterResult import RouterResult
 from app.streaming import RTXForword
-
+from app.adaptation import Knowledge
 
 class Car:
     """ a abstract class of something that is driving around in the streets """
@@ -92,7 +92,7 @@ class Car:
             # CSVLogger.logEvent("overhead", [tick, self.sourceID, self.targetID, durationForTrip,
             #                                 minimalCosts, tripOverhead, self.id, self.currentRouterResult.isVictim])
 
-            CSVLogger.logEvent("overhead", [tick, self.sourceID, self.targetID, self.rounds, durationForTrip,
+            CSVLogger.logEvent("overheads", [tick, self.sourceID, self.targetID, self.rounds, durationForTrip,
                                             minimalCosts, tripOverhead, self.id, self.driver_preference])
 
             # log to kafka
@@ -216,7 +216,7 @@ class Car:
             epos_file.write(str(cost) + ":")
             big_row = []
 
-            for i in range(3):
+            for i in range(Knowledge.planning_steps):
                 if i< len(all_routes):
                     d = all_routes[i]
                     big_row += [d[edge.id] if edge.id in d else 0 for edge in Network.routingEdges]
@@ -313,10 +313,10 @@ class Car:
 
 
     def find_occupancy_for_route(self, meta):
-        # [0-100] [101-200] [201-300] ...
+
+        interval = Knowledge.planning_step_horizon
         all_streets = []
         trip_time = 0
-        interval = 100
         checkpoint_index = 1
         # print "---------"
         streets_for_interval = {}

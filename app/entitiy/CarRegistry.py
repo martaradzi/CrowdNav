@@ -2,10 +2,12 @@ import subprocess
 from app import Config
 import fileinput
 import sys, os
+from app.network.Network import Network
 
 from app.entitiy.Car import Car
 from app.Util import  prepare_epos_input_data_folders
 from app.Util import get_output_folder_for_latest_EPOS_run
+from app.adaptation import Knowledge
 
 class NullCar:
     """ a car with no function used for error prevention """
@@ -77,14 +79,17 @@ class CarRegistry(object):
         print "Number of EPOS plans: " + str(number_of_epos_plans)
 
         cls.replaceAll("conf/epos.properties", "numAgents=", "numAgents=" + str(number_of_epos_plans))
+        cls.replaceAll("conf/epos.properties", "planDim=", "planDim=" + str(Network.edgesCount() * Knowledge.planning_steps))
+        cls.replaceAll("conf/epos.properties", "alpha=", "alpha=" + str(Knowledge.alpha))
+        cls.replaceAll("conf/epos.properties", "beta=", "beta=" + str(Knowledge.beta))
 
-        cls.run_epos_apply_results(False, cars_to_indexes)
+        cls.run_epos_apply_results(False, cars_to_indexes, tick)
 
     @classmethod
-    def run_epos_apply_results(cls, first_invocation, cars_to_indexes):
+    def run_epos_apply_results(cls, first_invocation, cars_to_indexes, tick):
         if Config.epos_mode_read:
             p = subprocess.Popen(["java", "-jar", Config.epos_jar_path])
-            print "Waiting for EPOS"
+            print "Invoking EPOS at tick " + str(tick)
             p.communicate()
             print "EPOS run completed!"
             cls.selectOptimalRoutes(get_output_folder_for_latest_EPOS_run(), first_invocation, cars_to_indexes)

@@ -17,7 +17,9 @@ import time
 from app.routing.RoutingEdge import RoutingEdge
 from app.logging import CSVLogger
 
-from app.Util import prepare_epos_input_data_folders
+import app.Util as Util
+from app.adaptation.Adaptation import Adaptation
+from app.adaptation import Knowledge
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -48,9 +50,17 @@ class Simulation(object):
     @classmethod
     def start(cls):
 
-        CSVLogger.logEvent("edges", [edge.id for edge in Network.routingEdges])
+        Knowledge.planning_period = Config.planning_period
+        Knowledge.planning_step_horizon = Config.planning_step_horizon
+        Knowledge.planning_steps = Config.planning_steps
+        Knowledge.alpha = Config.alpha
+        Knowledge.beta = Config.beta
 
-        prepare_epos_input_data_folders()
+        Util.remove_overhead_and_streets_files()
+
+        CSVLogger.logEvent("streets", [edge.id for edge in Network.routingEdges])
+
+        Util.prepare_epos_input_data_folders()
 
         """ start the simulation """
         info("# Start adding initial cars to the simulation", Fore.MAGENTA)
@@ -58,12 +68,16 @@ class Simulation(object):
         cls.applyFileConfig()
         CarRegistry.applyCarCounter()
 
-        CarRegistry.replaceAll("conf/epos.properties", "numAgents=", "numAgents=" + str(Config.totalCarCounter))
+        if Config.start_with_epos_optimization:
+            CarRegistry.replaceAll("conf/epos.properties", "numAgents=", "numAgents=" + str(Config.totalCarCounter))
+            CarRegistry.replaceAll("conf/epos.properties", "planDim=", "planDim=" + str(Network.edgesCount() * Knowledge.planning_steps))
+            CarRegistry.replaceAll("conf/epos.properties", "alpha=", "alpha=" + str(Knowledge.alpha))
+            CarRegistry.replaceAll("conf/epos.properties", "beta=", "beta=" + str(Knowledge.beta))
 
-        cars_to_indexes = {}
-        for i in range(Config.totalCarCounter):
-            cars_to_indexes["car-" + str(i)] = i
-        CarRegistry.run_epos_apply_results(True, cars_to_indexes)
+            cars_to_indexes = {}
+            for i in range(Config.totalCarCounter):
+                cars_to_indexes["car-" + str(i)] = i
+            CarRegistry.run_epos_apply_results(True, cars_to_indexes)
 
         cls.loop()
 
@@ -88,7 +102,7 @@ class Simulation(object):
             for removedCarId in traci.simulation.getSubscriptionResults()[122]:
                 CarRegistry.findById(removedCarId).setArrived(cls.tick)
 
-            CSVLogger.logEvent("edges", [cls.tick] + [traci.edge.getLastStepVehicleNumber(edge.id)*Config.vehicle_length / edge.length for edge in Network.routingEdges])
+            CSVLogger.logEvent("streets", [cls.tick] + [traci.edge.getLastStepVehicleNumber(edge.id)*Config.vehicle_length / edge.length for edge in Network.routingEdges])
 
             if (cls.tick % 10) == 0:
                 if Config.kafkaUpdates is False and Config.mqttUpdates is False:
@@ -140,5 +154,8 @@ class Simulation(object):
                 print("Simulation horizon reached!")
                 return
 
-            if Config.planning_period == cls.tick:
+            if (cls.tick % Knowledge.planning_period) == 0:
                 CarRegistry.do_epos_planning(cls.tick)
+
+            if (cls.tick % Config.adaptation_period) == 0:
+                Adaptation.sense_and_adapt(cls.tick)
