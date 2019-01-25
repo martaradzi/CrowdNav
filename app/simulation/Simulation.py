@@ -6,7 +6,7 @@ from app.network.Network import Network
 from colorama import Fore
 
 from app import Config
-from app.entitiy.CarRegistry import CarRegistry
+from app.entity.CarRegistry import CarRegistry
 from app.logging import info
 from app.routing.CustomRouter import CustomRouter
 import time
