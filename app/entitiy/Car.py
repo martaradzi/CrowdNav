@@ -1,7 +1,6 @@
 import random
 import traci
 import traci.constants as tc
-from app import Config
 import csv
 
 from app.Util import addToAverage
@@ -9,7 +8,6 @@ from app.logging import CSVLogger
 from app.network.Network import Network
 from app.routing.CustomRouter import CustomRouter
 from app.routing.RouterResult import RouterResult
-from app.streaming import RTXForword
 from app.adaptation import Knowledge
 
 class Car:
@@ -45,7 +43,7 @@ class Car:
         # the driver imperfection in handling the car
         self.imperfection = min(0.9, max(0.1, random.gauss(0.5, 0.5)))
         # is this car a smart car
-        self.smartCar = Config.smartCarPercentage > random.random()
+        self.smartCar = True
         # number of ticks since last reroute / arrival
         self.lastRerouteCounter = 0
 
@@ -64,7 +62,7 @@ class Car:
         from app.entitiy.CarRegistry import CarRegistry
 
         self.lastRerouteCounter = 0
-        if tick > Config.initialWaitTicks and self.smartCar:  # as we ignore the first 1000 ticks for this
+        if self.smartCar:  # as we ignore the first 1000 ticks for this
             # add a route to the global registry
             CarRegistry.totalTrips += 1
             # add the duration for this route to the global tripAverage
@@ -288,7 +286,7 @@ class Car:
             traci.vehicle.add(self.id, self.__createNewRoute(tick), tick, -4, -3)
             traci.vehicle.subscribe(self.id, (tc.VAR_ROAD_ID,))
 
-            if Config.epos_mode_write and epos_prepare_inputs:
+            if epos_prepare_inputs:
                 agent_ind = self.id[self.id.find("-")+1:]
                 self.create_epos_output_files(self.sourceID, self.targetID, tick, agent_ind)
 
@@ -314,6 +312,8 @@ class Car:
 
     def find_occupancy_for_route(self, meta):
 
+        from app.entitiy.CarRegistry import CarRegistry
+
         interval = Knowledge.planning_step_horizon
         all_streets = []
         trip_time = 0
@@ -322,7 +322,7 @@ class Car:
         streets_for_interval = {}
         all_streets.append(streets_for_interval)
 
-        vehicle_length = Config.vehicle_length
+        vehicle_length = CarRegistry.vehicle_length
 
         # print "--- NEW ROUTE ---"
         for m in meta:

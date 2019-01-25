@@ -5,3 +5,5 @@ planning_step_horizon = None
 
 alpha = None
 beta = None
+
+globalCostFunction=None

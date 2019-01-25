@@ -21,6 +21,7 @@ class NullCar:
 class CarRegistry(object):
     """ central registry for all our cars we have in the sumo simulation """
 
+    vehicle_length = 5
     # the total amount of cars that should be in the system
     totalCarCounter = Config.totalCarCounter
     # always increasing counter for carIDs
@@ -82,17 +83,17 @@ class CarRegistry(object):
         cls.replaceAll("conf/epos.properties", "planDim=", "planDim=" + str(Network.edgesCount() * Knowledge.planning_steps))
         cls.replaceAll("conf/epos.properties", "alpha=", "alpha=" + str(Knowledge.alpha))
         cls.replaceAll("conf/epos.properties", "beta=", "beta=" + str(Knowledge.beta))
+        cls.replaceAll("conf/epos.properties", "globalCostFunction=", "globalCostFunction=" + str(Knowledge.globalCostFunction))
 
         cls.run_epos_apply_results(False, cars_to_indexes, tick)
 
     @classmethod
     def run_epos_apply_results(cls, first_invocation, cars_to_indexes, tick):
-        if Config.epos_mode_read:
-            p = subprocess.Popen(["java", "-jar", Config.epos_jar_path])
-            print "Invoking EPOS at tick " + str(tick)
-            p.communicate()
-            print "EPOS run completed!"
-            cls.selectOptimalRoutes(get_output_folder_for_latest_EPOS_run(), first_invocation, cars_to_indexes)
+        p = subprocess.Popen(["java", "-jar", Config.epos_jar_path])
+        print "Invoking EPOS at tick " + str(tick)
+        p.communicate()
+        print "EPOS run completed!"
+        cls.selectOptimalRoutes(get_output_folder_for_latest_EPOS_run(), first_invocation, cars_to_indexes)
 
     @classmethod
     def selectOptimalRoutes(cls, output_folder_for_latest_run, first_invocation, cars_to_indexes):

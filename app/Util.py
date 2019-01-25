@@ -1,5 +1,5 @@
 """ Helper functions """
-import os, shutil, subprocess
+import os, shutil
 
 
 def addToAverage(totalCount, totalValue, newValue):
