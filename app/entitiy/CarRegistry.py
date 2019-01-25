@@ -60,12 +60,6 @@ class CarRegistry(object):
             return NullCar()
 
     @classmethod
-    def processTick(cls, tick):
-        """ processes the simulation tick on all registered cars """
-        for key in CarRegistry.cars:
-            CarRegistry.cars[key].processTick(tick)
-
-    @classmethod
     def do_epos_planning(cls, tick):
         prepare_epos_input_data_folders()
 

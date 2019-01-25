@@ -1,8 +1,5 @@
 # we need to import python modules from the $SUMO_HOME/tools directory
-import os
-import sys
-
-from colorama import Fore
+import os, sys
 
 
 # checks for SUMO and adds the SUMO_HOME directory to the list of dependencies

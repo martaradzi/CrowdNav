@@ -2,10 +2,8 @@ import sumolib
 
 from app import Config
 from app.routing.RoutingEdge import RoutingEdge
-from colorama import Fore
 
-import os
-import sys
+import os, sys
 
 # import of SUMO_HOME
 if 'SUMO_HOME' in os.environ:

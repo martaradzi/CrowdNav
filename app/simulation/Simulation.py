@@ -11,8 +11,6 @@ from app.logging import info
 from app.routing.CustomRouter import CustomRouter
 import time
 
-# get the current system time
-from app.routing.RoutingEdge import RoutingEdge
 from app.logging import CSVLogger
 
 import app.Util as Util

@@ -1,7 +1,6 @@
 from sumolib import checkBinary
 from app import Config
 import traci
-from colorama import Fore
 
 
 # Starts SUMO in the background using the defined network

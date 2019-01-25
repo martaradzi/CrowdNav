@@ -1,6 +1,5 @@
 from random import gauss
 
-import sys
 from dijkstar import Graph, find_path
 
 from app.network.Network import Network
