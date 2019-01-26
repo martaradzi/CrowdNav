@@ -5,11 +5,12 @@
 # True if we want to use the SUMO GUI
 sumoUseGUI = False  # False
 
+debug = False  # False
+
 # which seed to be used in the random functions, for repeatability
 random_seed = 1
 
 epos_jar_path = "/Users/gerostat/Documents/research/EPOS CROWDNAV/release-0.0.1/epos-tutorial.jar"
-######################################
 
 ######################################
 #### CONFIGURATION OF SIMULATION #####
@@ -25,7 +26,7 @@ sumoNet = "./app/map/eichstaedt.net.xml"
 totalCarCounter = 600
 
 #
-simulation_horizon = 299
+simulation_horizon = 301
 
 ######################################
 ##### CONFIGURATION OF PLANNING ######
@@ -57,4 +58,4 @@ globalCostFunction="VAR"
 #### CONFIGURATION OF ADAPTATION #####
 ######################################
 
-adaptation_period = 150
+adaptation_period = 130

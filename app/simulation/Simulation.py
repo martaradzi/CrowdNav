@@ -106,9 +106,7 @@ class Simulation(object):
             if (cls.tick % 100) == 0:
                 print("Simulation -> Step:" + str(cls.tick) + " # Driving cars: " + str(
                     traci.vehicle.getIDCount()) + "/" + str(
-                    CarRegistry.totalCarCounter) + " # avgTripDuration: " + str(
-                    CarRegistry.totalTripAverage) + "(" + str(
-                    CarRegistry.totalTrips) + ")" + " # avgTripOverhead: " + str(
+                    CarRegistry.totalCarCounter) + " # avgTripOverhead: " + str(
                     CarRegistry.totalTripOverheadAverage))
 
             if Config.simulation_horizon == cls.tick:

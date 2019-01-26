@@ -1,5 +1,9 @@
 from numpy import mean, var
+from collections import OrderedDict
 from app.adaptation import Knowledge
+from app.network.Network import Network
+import csv
+
 
 class Adaptation(object):
 
@@ -9,15 +13,15 @@ class Adaptation(object):
     @classmethod
     def sense_and_adapt(cls, tick):
 
-        average_trip_overhead = cls.__calculate_average_trip_overhead()
-        average_street_utilization, variance_of_street_utilization = cls.__calculate_average_street_utilization()
+        trip_overheads = cls.__calculate_trip_overheads()
+        street_utilizations = cls.__calculate_street_utilizations()
         print "*******************"
         print "MONITOR"
         print "*******************"
         print "Adaptation triggered at tick " + str(tick)
-        print "Average trip overhead: " + str(average_trip_overhead)
-        print "Average street utilization: " + str(average_street_utilization)
-        print "Variance of street utilization: " + str(variance_of_street_utilization)
+        print "Average trip overhead: " + str(mean(trip_overheads))
+        print "Average street utilization: " + str(mean(street_utilizations.values()))
+        print "Variance of street utilization: " + str(var(street_utilizations.values()))
 
         print "*******************"
         print "ANALYSIS"
@@ -32,26 +36,33 @@ class Adaptation(object):
         print "*******************"
         print "EXECUTION"
         print "*******************"
-        Knowledge.planning_steps = 4
-        Knowledge.beta = 1
-        print "Changing planning steps to: " + str(Knowledge.planning_steps)
+
+
+        sorted_street_utilizations = OrderedDict(sorted(street_utilizations.iteritems(), key=lambda (k,v): (v,k), reverse=True))
+        print sorted_street_utilizations.keys()[0]
+        print sorted_street_utilizations.values()[0]
+        cls.__apply_avoid_streets_signal(sorted_street_utilizations.keys()[0])
+
+        # Knowledge.planning_steps = 4
+        # Knowledge.beta = 1
+        # print "Changing planning steps to: " + str(Knowledge.planning_steps)
         print "*******************"
 
 
     @classmethod
-    def __calculate_average_trip_overhead(cls):
-        data = []
+    def __calculate_trip_overheads(cls):
+        trip_overheads = []
         with open("data/overheads.csv", 'r') as results:
             for i, line in enumerate(results):
                 if i >= cls.overheads_index:
-                    data.append(float(line.split(",")[6]))
+                    trip_overheads.append(float(line.split(",")[6]))
 
-            overheads_index_increment = len(data)
+            overheads_index_increment = len(trip_overheads)
             cls.overheads_index += overheads_index_increment
-        return mean(data)
+        return trip_overheads
 
     @classmethod
-    def __calculate_average_street_utilization(cls):
+    def __calculate_street_utilizations(cls):
         utilizations = []
         with open("data/streets.csv", 'r') as results:
             for i, line in enumerate(results):
@@ -69,6 +80,21 @@ class Adaptation(object):
         for i in range(len(streets)):
             streets_data[streets[i]] = [utilization[i] for utilization in utilizations]
 
-        streets_data_means = [mean(value) for key, value in streets_data.iteritems()]
+        streets_utilizations = {}
+        for key, value in streets_data.iteritems():
+            streets_utilizations[key] = mean(value)
 
-        return mean(streets_data_means), var(streets_data_means)
+        return streets_utilizations
+
+
+    @classmethod
+    def __apply_avoid_streets_signal(cls, edges_to_avoid):
+        avoid_streets_signal = []
+        for i in range(Knowledge.planning_steps):
+            avoid_streets_signal += [0 if edge.id in edges_to_avoid else 1 for edge in Network.routingEdges]
+
+        with open('datasets/plans/signal.target', 'w') as signal_fil:
+            signal_writer = csv.writer(signal_fil, dialect='excel')
+            signal_writer.writerow(avoid_streets_signal)
+
+        Knowledge.globalCostFunction = "XCORR"

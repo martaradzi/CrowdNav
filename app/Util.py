@@ -29,8 +29,12 @@ def prepare_epos_input_data_folders():
         os.makedirs("datasets")
 
     if os.path.exists("datasets/plans"):
-        shutil.rmtree("datasets/plans")
-    os.makedirs("datasets/plans")
+        plans_folder = os.listdir("datasets/plans")
+        for item in plans_folder:
+            if item.endswith(".plan"):
+                os.remove(item)
+    else:
+        os.makedirs("datasets/plans")
 
     if os.path.exists("datasets/routes"):
         shutil.rmtree("datasets/routes")

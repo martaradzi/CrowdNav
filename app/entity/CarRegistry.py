@@ -105,7 +105,8 @@ class CarRegistry(object):
             c = cls.cars[car_id]
             with open('datasets/routes/agent_' + str(epos_id) + '.routes', 'r') as plans_file:
                 plans=plans_file.readlines()
-            print "changing the route of " + str(c.id)
+            if Config.debug:
+                print "changing the route of " + str(c.id)
             selected_route = plans[res[epos_id]].replace('\r', '').replace('\n', '').split(",")
             i += 1
             c.change_route(selected_route, first_invocation)

@@ -10,6 +10,7 @@ from app.routing.CustomRouter import CustomRouter
 from app.routing.RouterResult import RouterResult
 from app.adaptation import Knowledge
 from app.entity.CarHistory import history_prefs
+from app import Config
 
 class Car:
     """ a abstract class of something that is driving around in the streets """
@@ -114,7 +115,8 @@ class Car:
             # set color to red
             return self.currentRouteID
         else:
-            print "exception when adding route for car " + str(self.id)
+            if Config.debug:
+                print "exception when adding route for car " + str(self.id)
 
             # recursion aka. try again as this should work!
             return self.__createNewRoute(tick)
@@ -128,7 +130,8 @@ class Car:
         previousNodeID = Network.getEdgeIDsToNode(previousEdgeID).getID()
 
         if previousNodeID == self.targetID:
-            print self.id + "\tis already reaching its destination and won't be considered in the optimization."
+            if Config.debug:
+                print self.id + "\tis already reaching its destination and won't be considered in the optimization."
             return False
 
         self.create_epos_output_files(previousNodeID, self.targetID, tick, agent_ind)
@@ -162,14 +165,14 @@ class Car:
 
     def create_output_files(self, cost, route, all_routes, agent_ind):
 
-        with open('datasets/plans/agent_' + agent_ind + '.plans', 'ab') as epos_file, \
+        with open('datasets/plans/agent_' + agent_ind + '.plans', 'ab') as plans_file, \
                 open('datasets/routes/agent_' + agent_ind + '.routes', 'ab') as routes_file:
 
-            epos_writer = csv.writer(epos_file, dialect='excel')
+            plans_writer = csv.writer(plans_file, dialect='excel')
             routes_writer = csv.writer(routes_file, dialect='excel')
             routes_writer.writerow(route)
 
-            epos_file.write(str(cost) + ":")
+            plans_file.write(str(cost) + ":")
             big_row = []
 
             for i in range(Knowledge.planning_steps):
@@ -179,7 +182,7 @@ class Car:
                 else:
                     big_row += [0 for edge in Network.routingEdges]
 
-            epos_writer.writerow(big_row)
+            plans_writer.writerow(big_row)
 
     def change_route(self, route, first_invocation):
         if first_invocation:
@@ -195,7 +198,8 @@ class Car:
                 traci.vehicle.setRoute(self.id, [currentEdgeID] + self.currentRouterResult.route)
             except Exception as e:
                 self.currentRouterResult.route = currentRoute
-                print("error in changing route " + str(e))
+                if Config.debug:
+                    print("error in changing route " + str(e))
 
     def change_preference(self, pref_id):
         self.driver_preference = Car.preferences_list[pref_id]
