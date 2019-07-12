@@ -160,18 +160,20 @@ class Car:
         """ adds this car to the simulation through the traci API """
         self.currentRouteBeginTick = tick
         try:
-            traci.vehicle.add(self.id, self.__createNewRoute(tick), tick, -4, -3)
+            # traci.vehicle.add(self.id, self.__createNewRoute(tick), tick, -4, -3)  for SUMO v < 1.2.0
+            traci.vehicle.add(self.id, self.__createNewRoute(tick))  # for SUMO v1.2.0
             traci.vehicle.subscribe(self.id, (tc.VAR_ROAD_ID,))
             # ! currently disabled for performance reasons
             # traci.vehicle.setAccel(self.id, self.acceleration)
             # traci.vehicle.setDecel(self.id, self.deceleration)
             # traci.vehicle.setImperfection(self.id, self.imperfection)
             if self.smartCar:
+                None
                 # set color to red
-                if self.currentRouterResult.isVictim:
-                    traci.vehicle.setColor(self.id, (0, 255, 0, 0))
-                else:
-                    traci.vehicle.setColor(self.id, (255, 0, 0, 0))
+                # if self.currentRouterResult.isVictim:
+                #     traci.vehicle.setColor(self.id, (0, 255, 0, 0))
+                # else:
+                #     traci.vehicle.setColor(self.id, (255, 0, 0, 0))
             else:
                 # dump car is using SUMO default routing, so we reroute using the same target
                 # putting the next line left == ALL SUMO ROUTING
