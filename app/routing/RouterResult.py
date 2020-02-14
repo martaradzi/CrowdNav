@@ -9,7 +9,7 @@ class RouterResult:
         # meta information for the route
         self.meta = tuple[1]
         # the route as list of edgeIDs
-        self.route = map(lambda x: x['edgeID'], self.meta)  # type: list[str]
+        self.route = list(map(lambda x: x['edgeID'], self.meta))  # type: list[str]
         # the cost for this route per edge
         self.costs = tuple[2]
         # the total cost for this route
