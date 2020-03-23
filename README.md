@@ -8,13 +8,14 @@ CrowdNav is a simulation based on SUMO and TraCI that implements a custom router
 that can be configured using kafka messages or local JSON config on the fly while the simulation is running.
 Also runtime data is send to a kafka queue to allow stream processing and logger locally to CSV.
 
+### Version requirements
+* Python version >=3.7 (tested for v3.7)
+* SUMO version >=1.2 (tested for v1.2)
+
 ### Minimal Setup
 * Download the CrowdNav code
 * Run `python setup.py install` to download all dependencies 
-* Install [SUMO](http://sumo.dlr.de) & set env var SUMO_HOME
-   1. Download SUMO from http://prdownloads.sourceforge.net/sumo/sumo-src-0.32.0.zip?download
-   2. Extract and note the full path to the directory
-   3. Set SUMO_HOME to point to this directory
+* Install [SUMO](https://sumo.dlr.de/docs/Installing.html) & set environment variable SUMO_HOME to point to SUMO installation folder
 * Install [Kafka](https://kafka.apache.org/) (we recommend [this](https://hub.docker.com/r/spotify/kafka/) Docker image) and set kafkaHost in Config.py
 * Run `python run.py`
 
