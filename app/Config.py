@@ -1,12 +1,11 @@
 #
 # Config file for SUMOS
 #
-import os
 
 # should use kafka for config changes (else it uses json file)
 kafkaUpdates = True
 # the kafka host we want to send our messages to
-kafkaHost = "kafka:9092"
+kafkaHost = "localhost:9092"
 
 mqttUpdates = False
 mqttHost = "localhost"
@@ -16,30 +15,25 @@ mqttPort = "1883"
 kafkaTopicTrips = "crowd-nav-trips"
 kafkaTopicPerformance = "crowd-nav-performance"
 kafkaTopicRouting = "crowd-nav-routing"
+kafkaTopicTicks = "crowd-nav-ticks"
 
 # where we receive system changes
 kafkaCommandsTopic = "crowd-nav-commands"
 
-# True if we want to use the SUMO GUI (always of in parallel mode)
-sumoUseGUI = True  # False
-
 # The network config (links to the net) we use for our simulation
-sumoConfig = os.path.join(os.environ["CROWDNAV"], "app/map/eichstaedt.sumo.cfg")
+sumoConfig = "./app/map/eichstaedt.sumo.cfg"
 
 # The network net we use for our simulation
-sumoNet = os.path.join(os.environ["CROWDNAV"], "app/map/eichstaedt.net.xml")
+sumoNet = "./app/map/eichstaedt.net.xml"
 
 # Initial wait time before publishing overheads
-# initialWaitTicks = 10
+initialWaitTicks = 200
 
 # the total number of cars we use in our simulation
-# totalCarCounter = 750
-
-#smartCarCounter = 500
+totalCarCounter = 500
 
 # percentage of cars that are smart
-# DEPRECATED - USE smartCarCounter instead
-# smartCarPercentage = 0.2
+smartCarPercentage = 0.2
 
 
 

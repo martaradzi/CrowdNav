@@ -2,7 +2,6 @@ import random
 import traci
 import traci.constants as tc
 from app import Config
-from math import log
 
 from app.Util import addToAverage
 from app.logging import CSVLogger
@@ -17,7 +16,7 @@ class Car:
 
     def __init__(self, id):
         # the string id
-        self.id = "car-" + str(id)  # type: str
+        self.id = id  # type: str
         # the rounds this car already drove
         self.rounds = 0  # type: int
         # the current route as a RouterResult
@@ -43,10 +42,7 @@ class Car:
         # the driver imperfection in handling the car
         self.imperfection = min(0.9, max(0.1, random.gauss(0.5, 0.5)))
         # is this car a smart car
-        self.smartCar = True
-        # self.smartCar = id <= Config.smartCarCounter
-        # old way of determining smart cars:
-        # self.smartCar = Config.smartCarPercentage > random.random()
+        self.smartCar = Config.smartCarPercentage > random.random()
         # number of ticks since last reroute / arrival
         self.lastRerouteCounter = 0
 
@@ -58,7 +54,7 @@ class Car:
         # add a round to the car
         self.rounds += 1
         self.lastRerouteCounter = 0
-        if self.smartCar: # all cars are smart!
+        if tick > Config.initialWaitTicks and self.smartCar:  # as we ignore the first 1000 ticks for this
             # add a route to the global registry
             CarRegistry.totalTrips += 1
             # add the duration for this route to the global tripAverage
@@ -76,23 +72,24 @@ class Car:
                 tripOverhead = 1
             # in rare cases a trip does take very long - as most outliers are <30, we cap the overhead to 30 here
             if tripOverhead > 30:
-                # print("-> capped overhead to 30 - " + str(minimalCosts) + " - " + str(durationForTrip) + " - " + str(
-                #     tripOverhead))
+                print("-> capped overhead to 30 - " + str(minimalCosts) + " - " + str(durationForTrip) + " - " + str(
+                    tripOverhead))
                 tripOverhead = 30
 
             CarRegistry.totalTripOverheadAverage = addToAverage(CarRegistry.totalTrips,
                                                                 CarRegistry.totalTripOverheadAverage,
                                                                 tripOverhead)
-            # CSVLogger.logEvent("overhead", [tick, self.sourceID, self.targetID, durationForTrip,
-            #                                 minimalCosts, tripOverhead, self.id, self.currentRouterResult.isVictim])
+            CSVLogger.logEvent("overhead", [tick, self.sourceID, self.targetID, durationForTrip,
+                                            minimalCosts, tripOverhead, self.id, self.currentRouterResult.isVictim])
             # log to kafka
             msg = dict()
             msg["tick"] = tick
+            msg["carNumber"] = traci.vehicle.getIDCount()
+            msg["totalCarNumber"] = CarRegistry.totalCarCounter
             msg["overhead"] = tripOverhead
-            # msg["complaint"] = self.generate_complaint(tripOverhead)
-            msg["minimalCosts"] = minimalCosts
-            msg["durationForTrip"] = durationForTrip
+            msg["complaint"] = self.generate_complaint(tripOverhead)
             RTXForword.publish(msg, Config.kafkaTopicTrips)
+            # print(msg)
 
         # if car is still enabled, restart it in the simulation
         if self.disabled is False:
@@ -112,7 +109,7 @@ class Car:
             self.sourceID = random.choice(Network.nodes).getID()
         else:
             self.sourceID = self.targetID  # We start where we stopped
-
+        # random target
         self.targetID = random.choice(Network.nodes).getID()
         self.currentRouteID = self.id + "-" + str(self.rounds)
         self.currentRouterResult = CustomRouter.route(self.sourceID, self.targetID, tick, self)
@@ -166,18 +163,20 @@ class Car:
         """ adds this car to the simulation through the traci API """
         self.currentRouteBeginTick = tick
         try:
-            traci.vehicle.add(self.id, self.__createNewRoute(tick), tick, -4, -3)
+            # traci.vehicle.add(self.id, self.__createNewRoute(tick), tick, -4, -3)  for SUMO v < 1.2.0
+            traci.vehicle.add(self.id, self.__createNewRoute(tick))  # for SUMO v1.2.0
             traci.vehicle.subscribe(self.id, (tc.VAR_ROAD_ID,))
             # ! currently disabled for performance reasons
             # traci.vehicle.setAccel(self.id, self.acceleration)
             # traci.vehicle.setDecel(self.id, self.deceleration)
             # traci.vehicle.setImperfection(self.id, self.imperfection)
             if self.smartCar:
+                None
                 # set color to red
-                if self.currentRouterResult.isVictim:
-                    traci.vehicle.setColor(self.id, (0, 255, 0, 0))
-                else:
-                    traci.vehicle.setColor(self.id, (255, 0, 0, 0))
+                # if self.currentRouterResult.isVictim:
+                #     traci.vehicle.setColor(self.id, (0, 255, 0, 0))
+                # else:
+                #     traci.vehicle.setColor(self.id, (255, 0, 0, 0))
             else:
                 # dump car is using SUMO default routing, so we reroute using the same target
                 # putting the next line left == ALL SUMO ROUTING

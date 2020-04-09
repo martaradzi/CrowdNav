@@ -13,6 +13,8 @@ from app.routing.CustomRouter import CustomRouter
 from app.streaming import RTXConnector
 import time
 
+import random
+
 # get the current system time
 from app.routing.RoutingEdge import RoutingEdge
 
@@ -64,11 +66,11 @@ class Simulation(object):
             traci.simulationStep()
 
             # Log tick duration to kafka
-            # duration = current_milli_time() - cls.lastTick
-            # cls.lastTick = current_milli_time()
-            # msg = dict()
-            # msg["duration"] = duration
-            # RTXForword.publish(msg, Config.kafkaTopicPerformance)
+            duration = current_milli_time() - cls.lastTick
+            cls.lastTick = current_milli_time()
+            msg = dict()
+            msg["duration"] = duration
+            RTXForword.publish(msg, Config.kafkaTopicPerformance)
 
             # Check for removed cars and re-add them into the system
             for removedCarId in traci.simulation.getSubscriptionResults()[122]:
@@ -80,7 +82,6 @@ class Simulation(object):
             # log time it takes for routing
             msg = dict()
             msg["duration"] = current_milli_time() - timeBeforeCarProcess
-            msg["tick"] = cls.tick
             RTXForword.publish(msg, Config.kafkaTopicRouting)
 
             # if we enable this we get debug information in the sumo-gui using global traveltime
@@ -128,9 +129,6 @@ class Simulation(object):
                         if "edge_average_influence" in newConf:
                             RoutingEdge.edgeAverageInfluence = newConf["edge_average_influence"]
                             print("setting edgeAverageInfluence: " + str(newConf["edge_average_influence"]))
-                        if "terminate" in newConf:
-                            print("received signal for termination")
-                            exit(0)
 
             # print status update if we are not running in parallel mode
             if (cls.tick % 100) == 0 and Config.parallelMode is False:
@@ -140,6 +138,25 @@ class Simulation(object):
                     CarRegistry.totalTripAverage) + "(" + str(
                     CarRegistry.totalTrips) + ")" + " # avgTripOverhead: " + str(
                     CarRegistry.totalTripOverheadAverage))
+            
+            if (cls.tick % 3000) == 0 and Config.parallelMode is False:
+                carNumber = CarRegistry.totalCarCounter
+                if carNumber <= 100:
+                    CarRegistry.totalCarCounter += 50
+                elif carNumber >= 900:
+                    CarRegistry.totalCarCounter -= 50
+                else:
+                    # n = random.choice([(carNumber+100), (carNumber-100)])
+                    # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
+                    # CarRegistry.totalCarCounter = n
+                    CarRegistry.totalCarCounter =  random.choice([(carNumber+100), (carNumber-100)])
+                CarRegistry.applyCarCounter()
+
+            if (cls.tick % 10) == 0:
+                msg = dict()
+                msg["tick"] = cls.tick 
+                RTXForword.publish(msg, Config.kafkaTopicTicks)
+                # print("setting totalCarCounter: " + str(newConf["total_car_counter"]))
 
                 # @depricated -> will be removed
                 # # if we are in paralllel mode we end the simulation after 10000 ticks with a result output

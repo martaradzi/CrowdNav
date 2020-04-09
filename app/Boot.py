@@ -8,46 +8,29 @@ from app.logging import info
 from app.routing.CustomRouter import CustomRouter
 from app.network.Network import Network
 from app.simulation.Simulation import Simulation
-from app.entitiy.CarRegistry import CarRegistry
-from streaming import RTXForword
+from app.streaming import RTXForword
 from colorama import Fore
-from sumo import SUMOConnector, SUMODependency
-import Config
+from app.sumo import SUMOConnector, SUMODependency
+import app.Config as Config
 import traci, sys, os
-import thread
 import time
-import random
 
 
 # uuid4()
-def start(processID, parallelMode,useGUI,seed, configuration, car_count):
+def start(processID, parallelMode,useGUI):
     """ main entry point into the application """
-
-    # Seed application
-    if (seed == None):
-      random.seed()
-    else:
-      random.seed(seed)
-
     Config.processID = processID
     Config.parallelMode = parallelMode
     Config.sumoUseGUI = useGUI
-
-    Config.kafkaTopicTrips = "crowd-nav-trips-" + str(processID)
-    Config.kafkaCommandsTopic = "crowd-nav-commands-" + str(processID)
-    Config.kafkaTopicRouting = Config.kafkaTopicRouting + "-" + str(processID)
 
     info('#####################################', Fore.CYAN)
     info('#      Starting CrowdNav v0.2       #', Fore.CYAN)
     info('#####################################', Fore.CYAN)
     info('# Configuration:', Fore.YELLOW)
-    info('# Kafka-Host    -> ' + Config.kafkaHost, Fore.YELLOW)
-    info('# Publishing to -> ' + Config.kafkaTopicTrips, Fore.YELLOW)
-    info('# Publishing to -> ' + Config.kafkaTopicRouting, Fore.YELLOW)
-    info('# Listening on  -> ' + Config.kafkaCommandsTopic, Fore.YELLOW)
-
-    apply_car_count(car_count)
-    apply_starting_configuration(configuration)
+    info('# Kafka-Host   -> ' + Config.kafkaHost, Fore.YELLOW)
+    info('# Kafka-Topic1 -> ' + Config.kafkaTopicTrips, Fore.YELLOW)
+    info('# Kafka-Topic2 -> ' + Config.kafkaTopicPerformance, Fore.YELLOW)
+    info('# Kafka-Topic3 -> ' + Config.kafkaTopicTicks, Fore.YELLOW)
 
     # init sending updates to kafka and getting commands from there
     if Config.kafkaUpdates or Config.mqttUpdates:
@@ -67,7 +50,7 @@ def start(processID, parallelMode,useGUI,seed, configuration, car_count):
     CustomRouter.init()
     # Start sumo in the background
     SUMOConnector.start()
-    info("\n# SUMO-Application " + str(processID) + " started OK!", Fore.GREEN)
+    info("\n# SUMO-Application started OK!", Fore.GREEN)
     # Start the simulation
     Simulation.start()
     # Simulation ended, so we shutdown
@@ -75,32 +58,3 @@ def start(processID, parallelMode,useGUI,seed, configuration, car_count):
     traci.close()
     sys.stdout.flush()
     return None
-
-
-def apply_starting_configuration(conf):
-    if "exploration_percentage" in conf:
-        CustomRouter.explorationPercentage = conf["exploration_percentage"]
-        info("# Setting victimsPercentage: " + str(conf["exploration_percentage"]), Fore.YELLOW)
-    if "route_random_sigma" in conf:
-        CustomRouter.routeRandomSigma = conf["route_random_sigma"]
-        info("# Setting routeRandomSigma: " + str(conf["route_random_sigma"]), Fore.YELLOW)
-    if "max_speed_and_length_factor" in conf:
-        CustomRouter.maxSpeedAndLengthFactor = conf["max_speed_and_length_factor"]
-        info("# Setting maxSpeedAndLengthFactor: " + str(conf["max_speed_and_length_factor"]), Fore.YELLOW)
-    if "average_edge_duration_factor" in conf:
-        CustomRouter.averageEdgeDurationFactor = conf["average_edge_duration_factor"]
-        info("# Setting averageEdgeDurationFactor: " + str(conf["average_edge_duration_factor"]), Fore.YELLOW)
-    if "freshness_update_factor" in conf:
-        CustomRouter.freshnessUpdateFactor = conf["freshness_update_factor"]
-        info("# Setting freshnessUpdateFactor: " + str(conf["freshness_update_factor"]), Fore.YELLOW)
-    if "freshness_cut_off_value" in conf:
-        CustomRouter.freshnessCutOffValue = conf["freshness_cut_off_value"]
-        info("# Setting freshnessCutOffValue: " + str(conf["freshness_cut_off_value"]), Fore.YELLOW)
-    if "re_route_every_ticks" in conf:
-        CustomRouter.reRouteEveryTicks = conf["re_route_every_ticks"]
-        info("# Setting reRouteEveryTicks: " + str(conf["re_route_every_ticks"]), Fore.YELLOW)
-
-
-def apply_car_count(car_count):
-    info("# Car count is " + str(car_count), Fore.YELLOW)
-    CarRegistry.totalCarCounter = car_count

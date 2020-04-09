@@ -16,7 +16,7 @@ class CarRegistry(object):
     """ central registry for all our cars we have in the sumo simulation """
 
     # the total amount of cars that should be in the system
-    totalCarCounter = 0
+    totalCarCounter = Config.totalCarCounter
     # always increasing counter for carIDs
     carIndexCounter = 0
     # list of all cars
@@ -36,7 +36,7 @@ class CarRegistry(object):
         while len(CarRegistry.cars) < cls.totalCarCounter:
             # to less cars -> add new
             cls.carIndexCounter += 1
-            c = Car(cls.carIndexCounter)
+            c = Car("car-" + str(CarRegistry.carIndexCounter))
             cls.cars[c.id] = c
             c.addToSimulation(0)
         while len(CarRegistry.cars) > cls.totalCarCounter:
