@@ -35,7 +35,7 @@ totalCarCounter = 500
 # percentage of cars that are smart
 smartCarPercentage = 0.2
 
-
+sumoUseGUI = False
 
 # runtime dependent variable
 processID = 0
