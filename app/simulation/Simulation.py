@@ -139,7 +139,7 @@ class Simulation(object):
                     CarRegistry.totalTrips) + ")" + " # avgTripOverhead: " + str(
                     CarRegistry.totalTripOverheadAverage))
             
-            if (cls.tick % 3000) == 0 and Config.parallelMode is False:
+            if (cls.tick % 5000) == 0 and Config.parallelMode is False:
                 carNumber = CarRegistry.totalCarCounter
                 if carNumber <= 100:
                     CarRegistry.totalCarCounter += 50
