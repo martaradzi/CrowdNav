@@ -84,10 +84,11 @@ class Car:
             # log to kafka
             msg = dict()
             msg["tick"] = tick
-            msg["carNumber"] = traci.vehicle.getIDCount()
+            # msg["carNumber"] = traci.vehicle.getIDCount()
+            msg['duration'] = durationForTrip
             msg["totalCarNumber"] = CarRegistry.totalCarCounter
             msg["overhead"] = tripOverhead
-            msg["complaint"] = self.generate_complaint(tripOverhead)
+            # msg["complaint"] = self.generate_complaint(tripOverhead)
             RTXForword.publish(msg, Config.kafkaTopicTrips)
             # print(msg)
 
