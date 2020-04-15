@@ -139,28 +139,28 @@ class Simulation(object):
                     CarRegistry.totalTrips) + ")" + " # avgTripOverhead: " + str(
                     CarRegistry.totalTripOverheadAverage))
             
-            if (cls.tick % 5000) == 0 and Config.parallelMode is False:
-                carNumber = CarRegistry.totalCarCounter
-                if carNumber <= 200:
-                    CarRegistry.totalCarCounter += 100
-                elif carNumber >= 900:
-                    CarRegistry.totalCarCounter -= 100
-                else:
-                    # n = random.choice([(carNumber+100), (carNumber-100)])
-                    # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
-                    # CarRegistry.totalCarCounter = n
-                    CarRegistry.totalCarCounter =  random.choice([(carNumber+100), (carNumber-100)])
-                CarRegistry.applyCarCounter()
-
-            # if (cls.tick % 3000) == 0 and Config.parallelMode is False:
+            # if (cls.tick % 5000) == 0 and Config.parallelMode is False:
             #     carNumber = CarRegistry.totalCarCounter
-            #     # if carNumber <= 200:
-            #     #     CarRegistry.totalCarCounter += 100
-            #     if carNumber >= 1600:
-            #         CarRegistry.totalCarCounter -= 500
-            #     else:
+            #     if carNumber <= 200:
             #         CarRegistry.totalCarCounter += 100
+            #     elif carNumber >= 900:
+            #         CarRegistry.totalCarCounter -= 100
+            #     else:
+            #         # n = random.choice([(carNumber+100), (carNumber-100)])
+            #         # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
+            #         # CarRegistry.totalCarCounter = n
+            #         CarRegistry.totalCarCounter =  random.choice([(carNumber+100), (carNumber-100)])
             #     CarRegistry.applyCarCounter()
+
+            if (cls.tick % 3000) == 0 and Config.parallelMode is False:
+                carNumber = CarRegistry.totalCarCounter
+                # if carNumber <= 200:
+                #     CarRegistry.totalCarCounter += 100
+                if carNumber >= 1600:
+                    CarRegistry.totalCarCounter -= 500
+                else:
+                    CarRegistry.totalCarCounter += 100
+                CarRegistry.applyCarCounter()
 
             if (cls.tick % 10) == 0:
                 msg = dict()
