@@ -74,7 +74,9 @@ class Simulation(object):
 
             # Check for removed cars and re-add them into the system
             for removedCarId in traci.simulation.getSubscriptionResults()[122]:
+                # x = traci.vehicle.getIDCount()
                 CarRegistry.findById(removedCarId).setArrived(cls.tick)
+
 
             timeBeforeCarProcess = current_milli_time()
             # let the cars process this step
@@ -143,7 +145,7 @@ class Simulation(object):
                 carNumber = CarRegistry.totalCarCounter
                 if carNumber <= 200:
                     CarRegistry.totalCarCounter += 100
-                elif carNumber >= 1000:
+                elif carNumber >= 600:
                     CarRegistry.totalCarCounter -= 100
                 else:
                    # n = random.choice([(carNumber+100), (carNumber-100)])

@@ -45,10 +45,12 @@ class Car:
         self.smartCar = Config.smartCarPercentage > random.random()
         # number of ticks since last reroute / arrival
         self.lastRerouteCounter = 0
+        # get the number of cars in the simulation when the car begins to move
+        self.startCarNumber = traci.vehicle.getIDCount()
 
     def setArrived(self, tick):
         """ car arrived at its target, so we add some statistic data """
-
+        # startCarNumber = x
         # import here because python can not handle circular-dependencies
         from app.entitiy.CarRegistry import CarRegistry
         # add a round to the car
@@ -86,12 +88,13 @@ class Car:
             msg["tick"] = tick
             # msg["carNumber"] = traci.vehicle.getIDCount()
             msg['duration'] = durationForTrip
+            msg['startCarNumber'] = self.startCarNumber
             msg["totalCarNumber"] = CarRegistry.totalCarCounter
             msg["overhead"] = tripOverhead
             # msg["complaint"] = self.generate_complaint(tripOverhead)
             RTXForword.publish(msg, Config.kafkaTopicTrips)
             # print(msg)
-
+            startCarNumber = traci.vehicle.getIDCount()
         # if car is still enabled, restart it in the simulation
         if self.disabled is False:
             self.addToSimulation(tick)
