@@ -58,6 +58,8 @@ class Simulation(object):
     def loop(cls):
         """ loops the simulation """
 
+        counter = 0
+
         # start listening to all cars that arrived at their target
         traci.simulation.subscribe((tc.VAR_ARRIVED_VEHICLES_IDS,))
         while 1:
@@ -141,28 +143,28 @@ class Simulation(object):
                     CarRegistry.totalTrips) + ")" + " # avgTripOverhead: " + str(
                     CarRegistry.totalTripOverheadAverage))
            
-            # counter = 0
+            
             if (cls.tick % 5000) == 0 and Config.parallelMode is False:
-                # if counter == 0 or counter == 9 or counter == 10 or counter == 19:
-                #     CarRegistry.totalCarCounter = 200
-                # elif counter == 1 or counter == 8 or counter == 11 or counter == 18:
-                #     CarRegistry.totalCarCounter = 300
-                # elif counter == 2 or counter == 7 or counter == 12 or counter == 17:
-                #     CarRegistry.totalCarCounter = 400
-                # elif counter == 3 or counter == 6 or counter == 13 or counter == 16:
-                #     CarRegistry.totalCarCounter = 500
-                # else:
-                #     CarRegistry.totalCarCounter = 600
-                # counter += 1
-                # CarRegistry.applyCarCounter()
-                carNumber = CarRegistry.totalCarCounter
-                if carNumber <= 200:
-                   CarRegistry.totalCarCounter += 100
-                elif carNumber >= 600:
-                   CarRegistry.totalCarCounter -= 100
+                if counter == 0 or counter == 9 or counter == 10 or counter == 19:
+                    CarRegistry.totalCarCounter = 200
+                elif counter == 1 or counter == 8 or counter == 11 or counter == 18:
+                    CarRegistry.totalCarCounter = 300
+                elif counter == 2 or counter == 7 or counter == 12 or counter == 17:
+                    CarRegistry.totalCarCounter = 400
+                elif counter == 3 or counter == 6 or counter == 13 or counter == 16:
+                    CarRegistry.totalCarCounter = 500
                 else:
-                    # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
-                    CarRegistry.totalCarCounter =  random.choice([(carNumber+100), (carNumber-100)])
+                    CarRegistry.totalCarCounter = 600
+                counter += 1
+                CarRegistry.applyCarCounter()
+                # carNumber = CarRegistry.totalCarCounter
+                # if carNumber <= 200:
+                #    CarRegistry.totalCarCounter += 100
+                # elif carNumber >= 600:
+                #    CarRegistry.totalCarCounter -= 100
+                # else:
+                #     # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
+                #     CarRegistry.totalCarCounter =  random.choice([(carNumber+100), (carNumber-100)])
 
                 CarRegistry.applyCarCounter()
 
