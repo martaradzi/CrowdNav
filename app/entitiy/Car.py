@@ -94,7 +94,7 @@ class Car:
             # msg["complaint"] = self.generate_complaint(tripOverhead)
             RTXForword.publish(msg, Config.kafkaTopicTrips)
             # print(msg)
-            startCarNumber = traci.vehicle.getIDCount()
+            self.startCarNumber = traci.vehicle.getIDCount()
         # if car is still enabled, restart it in the simulation
         if self.disabled is False:
             self.addToSimulation(tick)
