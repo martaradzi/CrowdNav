@@ -145,32 +145,32 @@ class Simulation(object):
            
             
             if (cls.tick % 5000) == 0 and Config.parallelMode is False:
-                if counter == 14 or counter == 15 or counter == 30:
-                    CarRegistry.totalCarCounter = 200
-                elif counter == 0 or counter == 13 or counter == 16 or counter == 29:
-                    CarRegistry.totalCarCounter = 300
-                elif counter == 1 or counter == 12 or counter == 17 or counter == 28:
-                    CarRegistry.totalCarCounter = 400
-                elif counter == 2 or counter == 11 or counter == 18 or counter == 27:
-                    CarRegistry.totalCarCounter = 500
-                elif counter == 3 or counter == 10 or counter == 19 or counter == 26:
-                    CarRegistry.totalCarCounter = 600
-                elif counter == 4 or counter == 9 or counter == 20 or counter == 25:
-                    CarRegistry.totalCarCounter = 700
-                elif counter == 5 or counter == 8 or counter == 21 or counter == 24:
-                    CarRegistry.totalCarCounter = 800
-                else:
-                    CarRegistry.totalCarCounter = 900
-                counter += 1
-                CarRegistry.applyCarCounter()
-                # carNumber = CarRegistry.totalCarCounter
-                # if carNumber <= 200:
-                #    CarRegistry.totalCarCounter += 100
-                # elif carNumber >= 600:
-                #    CarRegistry.totalCarCounter -= 100
+                # if counter == 14 or counter == 15 or counter == 30:
+                #     CarRegistry.totalCarCounter = 200
+                # elif counter == 0 or counter == 13 or counter == 16 or counter == 29:
+                #     CarRegistry.totalCarCounter = 300
+                # elif counter == 1 or counter == 12 or counter == 17 or counter == 28:
+                #     CarRegistry.totalCarCounter = 400
+                # elif counter == 2 or counter == 11 or counter == 18 or counter == 27:
+                #     CarRegistry.totalCarCounter = 500
+                # elif counter == 3 or counter == 10 or counter == 19 or counter == 26:
+                #     CarRegistry.totalCarCounter = 600
+                # elif counter == 4 or counter == 9 or counter == 20 or counter == 25:
+                #     CarRegistry.totalCarCounter = 700
+                # elif counter == 5 or counter == 8 or counter == 21 or counter == 24:
+                #     CarRegistry.totalCarCounter = 800
                 # else:
-                #     # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
-                #     CarRegistry.totalCarCounter =  random.choice([(carNumber+100), (carNumber-100)])
+                #     CarRegistry.totalCarCounter = 900
+                # counter += 1
+                # CarRegistry.applyCarCounter()
+                carNumber = CarRegistry.totalCarCounter
+                if carNumber <= 200:
+                   CarRegistry.totalCarCounter += 100
+                elif carNumber >= 1000:
+                   CarRegistry.totalCarCounter -= 100
+                else:
+                    # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
+                    CarRegistry.totalCarCounter =  random.choice([(carNumber+100), (carNumber-100)])
 
                 CarRegistry.applyCarCounter()
 
