@@ -34,6 +34,8 @@ class RoutingEdge:
         # when did we get the last infromation
         self.lastDurationUpdateTick = 0
 
+        self.accidentFlag = False
+
     def applyEdgeDurationToAverage(self, duration, tick):
         """ adds a duration to drive on this edge to the calculation """
         # VARIANTE 1
@@ -48,6 +50,19 @@ class RoutingEdge:
         # self.averageDurationCounter += 1
         # self.averageDuration = addToAverage(self.averageDurationCounter, self.averageDuration, duration)
         # self.lastDurationUpdateTick = tick
+
+
+    def applyBlockEdgeDuration(self, tick):
+        """ changes duration and accident flag"""
+        # print('@@@@@@')
+        self.averageDuration = 999
+        self.maxSpeed = 0
+        self.accidentFlag = True
+        # print(self.accidentFlag)
+        # print(self.id)
+        self.lastDurationUpdateTick = tick
+        
+
 
     def __str__(self):
         return "Edge(" + self.fromNode.getID() \

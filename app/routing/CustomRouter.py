@@ -38,7 +38,7 @@ class CustomRouter(object):
             self.edgeMap[edge.id] = edge
             self.graph.add_edge(edge.fromNodeID, edge.toNodeID,
                                 {'length': edge.length, 'maxSpeed': edge.maxSpeed,
-                                 'lanes': len(edge.lanes), 'edgeID': edge.id})
+                                 'lanes': len(edge.lanes), 'edgeID': edge.id, 'accidentFlag': edge.accidentFlag})
 
     @classmethod
     def minimalRoute(cls, fr, to, tick, car):
@@ -46,6 +46,15 @@ class CustomRouter(object):
         cost_func = lambda u, v, e, prev_e: e['length'] / e['maxSpeed']
         route = find_path(cls.graph, fr, to, cost_func=cost_func)
         return RouterResult(route, False)
+
+    # @classmethod
+    # def costFunction(u, v, e, prev_e):
+    #     """return cost of the route """
+    #     if e['accidentFlag'] == True:
+    #         return 9999
+    #     else:
+    #         return  e['length'] / e['maxSpeed']
+
 
     @classmethod
     def route(cls, fr, to, tick, car):
@@ -69,25 +78,66 @@ class CustomRouter(object):
             victimizationChoice = 1
         else:
             victimizationChoice = 0
+            
 
-        cost_func = lambda u, v, e, prev_e: \
-            cls.getFreshness(e["edgeID"], tick) * \
-            cls.averageEdgeDurationFactor * \
-            cls.getAverageEdgeDuration(e["edgeID"]) \
-            + \
-            (1 - cls.getFreshness(e["edgeID"], tick)) * \
-            cls.maxSpeedAndLengthFactor * \
-            max(1, gauss(1, cls.routeRandomSigma) *
-            (e['length']) / e['maxSpeed']) \
-            - \
-            (1 - cls.getFreshness(e["edgeID"], tick)) * \
-            cls.freshnessUpdateFactor * \
-            victimizationChoice
+        def costFunction(u, v, e, prev_e):
+            """return cost of the route """
+            # print('in the router')
+            # print(e['accidentFlag'])
+            # print(e['edgeID'])
+            # print('\n\n')
+
+            # if e["accidentFlag"] == True:
+            if cls.getFlag(e["edgeID"]):
+
+            # if e['edgeID'] == '-2883' or e['edgeID'] == '2883':
+                print('***************entered_if**************************')
+                return 999999999999999999999
+            else:
+                # print('OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO')
+                # return  cls.getFreshness(e["edgeID"], tick) * \
+                #         cls.averageEdgeDurationFactor * \
+                #         cls.getAverageEdgeDuration(e["edgeID"]) \
+                #         + \
+                #         (1 - cls.getFreshness(e["edgeID"], tick)) * \
+                #         cls.maxSpeedAndLengthFactor * \
+                #         max(1, gauss(1, cls.routeRandomSigma) *
+                #         (e['length']) / e['maxSpeed']) \
+                #         - \
+                #         (1 - cls.getFreshness(e["edgeID"], tick)) * \
+                #         cls.freshnessUpdateFactor * \
+                #         victimizationChoice
+                return e['length'] / e['maxSpeed']
+
+
+        # cost_func = lambda u, v, e, prev_e: \
+        #     cls.getFreshness(e["edgeID"], tick) * \
+        #     cls.averageEdgeDurationFactor * \
+        #     cls.getAverageEdgeDuration(e["edgeID"]) \
+        #     + \
+        #     (1 - cls.getFreshness(e["edgeID"], tick)) * \
+        #     cls.maxSpeedAndLengthFactor * \
+        #     max(1, gauss(1, cls.routeRandomSigma) *
+        #     (e['length']) / e['maxSpeed']) \
+        #     - \
+        #     (1 - cls.getFreshness(e["edgeID"], tick)) * \
+        #     cls.freshnessUpdateFactor * \
+        #     victimizationChoice
+
+        cost_func = lambda u, v, e, prev_e: costFunction(u, v, e, prev_e)
 
         # generate route
         route = find_path(cls.graph, fr, to, cost_func=cost_func)
         # wrap the route in a result object
         return RouterResult(route, isVictim)
+
+
+    @classmethod
+    def getFlag(cls, edgeID):
+        if cls.edgeMap[edgeID].accidentFlag:
+            return True
+        else:
+            return False
 
     @classmethod
     def getFreshness(cls, edgeID, tick):
@@ -111,6 +161,20 @@ class CustomRouter(object):
     def applyEdgeDurationToAverage(cls, edge, duration, tick):
         """ tries to calculate how long it will take for a single edge """
         try:
+            # print(edge)
             cls.edgeMap[edge].applyEdgeDurationToAverage(duration, tick)
+        except:
+            return 1
+
+    @classmethod
+    def applyBlockEdgeDuration(cls, edge, tick):
+        """ block an edge """
+        try:
+            # print('OOOOOOO') # THIS WORKS
+            # print(str(cls.edgeMap[edge]))
+            # print(cls.edgeMap[edge].accidentFlag)
+            cls.edgeMap[edge].applyBlockEdgeDuration(tick)
+            # print(cls.edgeMap[edge].accidentFlag)
+            # print('OOOOO \n')
         except:
             return 1

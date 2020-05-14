@@ -146,10 +146,30 @@ class Car:
                 except traci.exceptions.TraCIException as e:
                     # print(e)
                     pass
+        # print(self.id)
+        # print(self.currentEdgeID)
+        # print(traci.vehicle.getSubscriptionResults(self.id))
 
-        roadID = traci.vehicle.getSubscriptionResults(self.id)[80]
+        result = traci.vehicle.getSubscriptionResults(self.id)
+        # print(result)
+        if result is None:
+            edge = ['2883', '-2883', '2722', '-2722', '2910', '2910']
+            # edge = '2883'
+            # CustomRouter.applyBlockEdgeDuration(edge, tick)
+            for i in edge:
+                # print('edge id######################')
+                # print(i)
+                # print('\n')
+                CustomRouter.applyBlockEdgeDuration(i, tick)
+            return 
+
+        roadID = result[80]
+
         if roadID != self.currentEdgeID and self.smartCar:
             if self.currentEdgeBeginTick is not None:
+                # print('edge id')
+                # print(type(self.currentEdgeID))
+                # print('\n')
                 CustomRouter.applyEdgeDurationToAverage(self.currentEdgeID, tick - self.currentEdgeBeginTick, tick)
                 # CSVLogger.logEvent("edge", [tick, self.currentEdgeID,
                 #                             tick - self.currentEdgeBeginTick, self.id])
