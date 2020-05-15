@@ -33,7 +33,7 @@ class RoutingEdge:
         self.averageDurationCounter = 0
         # when did we get the last infromation
         self.lastDurationUpdateTick = 0
-
+        # is the edge closed
         self.accidentFlag = False
 
     def applyEdgeDurationToAverage(self, duration, tick):
@@ -51,19 +51,13 @@ class RoutingEdge:
         # self.averageDuration = addToAverage(self.averageDurationCounter, self.averageDuration, duration)
         # self.lastDurationUpdateTick = tick
 
-
     def applyBlockEdgeDuration(self, tick):
         """ changes duration and accident flag"""
-        # print('@@@@@@')
         self.averageDuration = 999
         self.maxSpeed = 0
         self.accidentFlag = True
-        # print(self.accidentFlag)
-        # print(self.id)
         self.lastDurationUpdateTick = tick
-        
-
-
+    
     def __str__(self):
         return "Edge(" + self.fromNode.getID() \
                + "," + self.toNode.getID() \

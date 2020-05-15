@@ -70,17 +70,9 @@ class CustomRouter(object):
     
         def costFunction(u, v, e, prev_e):
             """return cost of the route paying attention to disabled lanes"""
-            # print('in the router')
-            # print(e['accidentFlag'])
-            # print(e['edgeID'])
-            # print('\n\n')
-
             if cls.getFlag(e["edgeID"]):
-            # if e['edgeID'] == '-2883' or e['edgeID'] == '2883':
-                # print('*********entered_if*******')
                 return 99999999
             else:
-                # print('OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO')
                 return  cls.getFreshness(e["edgeID"], tick) * \
                         cls.averageEdgeDurationFactor * \
                         cls.getAverageEdgeDuration(e["edgeID"]) \
@@ -93,14 +85,13 @@ class CustomRouter(object):
                         (1 - cls.getFreshness(e["edgeID"], tick)) * \
                         cls.freshnessUpdateFactor * \
                         victimizationChoice
-                # return e['length'] / e['maxSpeed']
+
 
         isVictim = cls.explorationPercentage > random()
         if isVictim:
             victimizationChoice = 1
         else:
             victimizationChoice = 0
-
 
         # cost_func = lambda u, v, e, prev_e: \
         #     cls.getFreshness(e["edgeID"], tick) * \
@@ -163,3 +154,4 @@ class CustomRouter(object):
             cls.edgeMap[edge].applyBlockEdgeDuration(tick)
         except:
             return 1
+            

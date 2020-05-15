@@ -161,23 +161,21 @@ class Simulation(object):
                     # traci.lane.setDisallowed('-2942_0', dissallowed_classes)
                     # traci.lane.setDisallowed('2942_0', dissallowed_classes)
 
-                    # # this edge kind of works, some cars are still stuck. Might be due to their destinations being between the two 
+                    # # this edge kind of works, some cars are still stuck
                     # traci.lane.setDisallowed('-2631#0_0', dissallowed_classes)
                     # traci.lane.setDisallowed('2631#0_0', dissallowed_classes)
                     # traci.lane.setDisallowed('-2777#0_0', dissallowed_classes)
                     # traci.lane.setDisallowed('2777#0_0', dissallowed_classes)
 
-                    # # this edge kinda works. Rises traci.exceptions.TraCIException: Vehicle 'car-182' is not know
+                    # # this edge kinda works. Rises traci.exceptions
                     # traci.lane.setDisallowed('-2748_0', dissallowed_classes)
                     # traci.lane.setDisallowed('-2748_1', dissallowed_classes)
                     # traci.lane.setDisallowed('2748_0', dissallowed_classes)
                     # traci.lane.setDisallowed('2748_1', dissallowed_classes)
-
                     # traci.lane.setDisallowed('-2808_0', dissallowed_classes)
                     # traci.lane.setDisallowed('-2808_1', dissallowed_classes)
                     # traci.lane.setDisallowed('2808_0', dissallowed_classes)
                     # traci.lane.setDisallowed('2808_1', dissallowed_classes)
-
                     # traci.lane.setDisallowed('-2954_0', dissallowed_classes)
                     # traci.lane.setDisallowed('-2954_1', dissallowed_classes)
                     # traci.lane.setDisallowed('2954_0', dissallowed_classes)

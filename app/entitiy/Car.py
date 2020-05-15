@@ -159,10 +159,7 @@ class Car:
         result = traci.vehicle.getSubscriptionResults(self.id)
         # check if lanes are closed
         if result is None:
-            # edges = ['2883', '-2883', '2722', '-2722', '2910', '2910']
-            # edges = ['-2835#1', '2835#1']
             edges = ['-2748', '2748', '2808', '-2808', '-2954', '2954']
-            # edges = ['-2631#0', '2631#0', '-2777#0' , '2777#0']
             for i in edges:
                 CustomRouter.applyBlockEdgeDuration(i, tick)   
             return 
