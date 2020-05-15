@@ -47,13 +47,6 @@ class CustomRouter(object):
         route = find_path(cls.graph, fr, to, cost_func=cost_func)
         return RouterResult(route, False)
 
-    # @classmethod
-    # def costFunction(u, v, e, prev_e):
-    #     """return cost of the route """
-    #     if e['accidentFlag'] == True:
-    #         return 9999
-    #     else:
-    #         return  e['length'] / e['maxSpeed']
 
 
     @classmethod
@@ -73,41 +66,40 @@ class CustomRouter(object):
         # else:
         # 2) Advanced cost function that combines duration with averaging
         # isVictim = ??? random x percent (how many % routes have been victomized before)
-        isVictim = cls.explorationPercentage > random()
-        if isVictim:
-            victimizationChoice = 1
-        else:
-            victimizationChoice = 0
-            
 
+    
         def costFunction(u, v, e, prev_e):
-            """return cost of the route """
+            """return cost of the route paying attention to disabled lanes"""
             # print('in the router')
             # print(e['accidentFlag'])
             # print(e['edgeID'])
             # print('\n\n')
 
-            # if e["accidentFlag"] == True:
             if cls.getFlag(e["edgeID"]):
-
             # if e['edgeID'] == '-2883' or e['edgeID'] == '2883':
-                print('***************entered_if**************************')
-                return 999999999999999999999
+                # print('*********entered_if*******')
+                return 99999999
             else:
                 # print('OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO')
-                # return  cls.getFreshness(e["edgeID"], tick) * \
-                #         cls.averageEdgeDurationFactor * \
-                #         cls.getAverageEdgeDuration(e["edgeID"]) \
-                #         + \
-                #         (1 - cls.getFreshness(e["edgeID"], tick)) * \
-                #         cls.maxSpeedAndLengthFactor * \
-                #         max(1, gauss(1, cls.routeRandomSigma) *
-                #         (e['length']) / e['maxSpeed']) \
-                #         - \
-                #         (1 - cls.getFreshness(e["edgeID"], tick)) * \
-                #         cls.freshnessUpdateFactor * \
-                #         victimizationChoice
-                return e['length'] / e['maxSpeed']
+                return  cls.getFreshness(e["edgeID"], tick) * \
+                        cls.averageEdgeDurationFactor * \
+                        cls.getAverageEdgeDuration(e["edgeID"]) \
+                        + \
+                        (1 - cls.getFreshness(e["edgeID"], tick)) * \
+                        cls.maxSpeedAndLengthFactor * \
+                        max(1, gauss(1, cls.routeRandomSigma) *
+                        (e['length']) / e['maxSpeed']) \
+                        - \
+                        (1 - cls.getFreshness(e["edgeID"], tick)) * \
+                        cls.freshnessUpdateFactor * \
+                        victimizationChoice
+                # return e['length'] / e['maxSpeed']
+
+        isVictim = cls.explorationPercentage > random()
+        if isVictim:
+            victimizationChoice = 1
+        else:
+            victimizationChoice = 0
 
 
         # cost_func = lambda u, v, e, prev_e: \
@@ -125,10 +117,8 @@ class CustomRouter(object):
         #     victimizationChoice
 
         cost_func = lambda u, v, e, prev_e: costFunction(u, v, e, prev_e)
-
         # generate route
         route = find_path(cls.graph, fr, to, cost_func=cost_func)
-        # wrap the route in a result object
         return RouterResult(route, isVictim)
 
 
@@ -170,11 +160,6 @@ class CustomRouter(object):
     def applyBlockEdgeDuration(cls, edge, tick):
         """ block an edge """
         try:
-            # print('OOOOOOO') # THIS WORKS
-            # print(str(cls.edgeMap[edge]))
-            # print(cls.edgeMap[edge].accidentFlag)
             cls.edgeMap[edge].applyBlockEdgeDuration(tick)
-            # print(cls.edgeMap[edge].accidentFlag)
-            # print('OOOOO \n')
         except:
             return 1

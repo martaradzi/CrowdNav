@@ -148,19 +148,49 @@ class Simulation(object):
                     CarRegistry.totalTripOverheadAverage))
            
             
-            if (cls.tick % 100) == 0 and Config.parallelMode is False:
-                x = counter /2 
+            if (cls.tick % 5000) == 0 and Config.parallelMode is False:
+                x = counter /2
                 counter += 1
                 if x < 1:
                     n = 450
-                    traci.lane.setDisallowed('2883_0', dissallowed_classes)
-                    traci.lane.setDisallowed('-2883_0', dissallowed_classes)
-                    # traci.lane.setDisallowed('-2722_0', dissallowed_classes)
-                    # traci.lane.setDisallowed('2722_0', dissallowed_classes)
-                    # traci.lane.setDisallowed('-2910_0', dissallowed_classes)
-                    # traci.lane.setDisallowed('2910_0', dissallowed_classes)
-                    # traci.lane.setMaxSpeed('-2883_0', -1)
-                    # traci.lane.setMaxSpeed('-2883_0', -1)     
+                    # this edge doesnt work 
+                    # traci.lane.setDisallowed('2883_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('-2883_0', dissallowed_classes)
+
+                    # this edge works
+                    # traci.lane.setDisallowed('-2942_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('2942_0', dissallowed_classes)
+
+                    # # this edge kind of works, some cars are still stuck. Might be due to their destinations being between the two 
+                    # traci.lane.setDisallowed('-2631#0_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('2631#0_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('-2777#0_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('2777#0_0', dissallowed_classes)
+
+                    # # this edge kinda works. Rises traci.exceptions.TraCIException: Vehicle 'car-182' is not know
+                    # traci.lane.setDisallowed('-2748_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('-2748_1', dissallowed_classes)
+                    # traci.lane.setDisallowed('2748_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('2748_1', dissallowed_classes)
+
+                    # traci.lane.setDisallowed('-2808_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('-2808_1', dissallowed_classes)
+                    # traci.lane.setDisallowed('2808_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('2808_1', dissallowed_classes)
+
+                    # traci.lane.setDisallowed('-2954_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('-2954_1', dissallowed_classes)
+                    # traci.lane.setDisallowed('2954_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('2954_1', dissallowed_classes)
+
+                    # Also kinda works
+                    # traci.lane.setDisallowed('-2835#1_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('2835#1_0', dissallowed_classes)
+
+                    #Also kinda works
+                    # traci.lane.setDisallowed('-2966#0_0', dissallowed_classes)
+                    # traci.lane.setDisallowed('2966#0_0', dissallowed_classes)
+
                 elif x >= 1 and x < 2:
                     n = 520               
                 elif x >= 2 and x < 3:
@@ -211,27 +241,27 @@ class Simulation(object):
                     n = 450
                     # change lane avilibility if not already closed
                     if road_closed == False:
-                        traci.lane.setDisallowed('2883_0', dissallowed_classes)
-                        traci.lane.setDisallowed('-2883_0', dissallowed_classes)
+                        traci.lane.setDisallowed('-2748_0', dissallowed_classes)
+                        traci.lane.setDisallowed('-2748_1', dissallowed_classes)
+                        traci.lane.setDisallowed('2748_0', dissallowed_classes)
+                        traci.lane.setDisallowed('2748_1', dissallowed_classes)
+
+                        traci.lane.setDisallowed('-2808_0', dissallowed_classes)
+                        traci.lane.setDisallowed('-2808_1', dissallowed_classes)
+                        traci.lane.setDisallowed('2808_0', dissallowed_classes)
+                        traci.lane.setDisallowed('2808_1', dissallowed_classes)
+
+                        traci.lane.setDisallowed('-2954_0', dissallowed_classes)
+                        traci.lane.setDisallowed('-2954_1', dissallowed_classes)
+                        traci.lane.setDisallowed('2954_0', dissallowed_classes)
+                        traci.lane.setDisallowed('2954_1', dissallowed_classes)
                         road_closed = True
                     # reset counter to start a new 'day'
                     counter = 1
 
-                # traci.lane.setDisallowed('2883_0', dissallowed_classes)
-                # traci.lane.setDisallowed('-2883_0', dissallowed_classes)
                 CarRegistry.totalCarCounter = n
                 CarRegistry.applyCarCounter()
                 
-                # carNumber = CarRegistry.totalCarCounter
-                # if carNumber <= 200:
-                #    CarRegistry.totalCarCounter += 100
-                # elif carNumber >= 1000:
-                #    CarRegistry.totalCarCounter -= 100
-                # else:
-                #     # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
-                #     CarRegistry.totalCarCounter =  random.choice([(carNumber+100), (carNumber-100)])
-
-                # CarRegistry.applyCarCounter()
 
             if (cls.tick % 10) == 0:
                 msg = dict()
