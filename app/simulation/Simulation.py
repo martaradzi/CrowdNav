@@ -166,7 +166,7 @@ class Simulation(object):
                 carNumber = CarRegistry.totalCarCounter
                 if carNumber <= 200:
                    CarRegistry.totalCarCounter += 100
-                elif carNumber >= 1000:
+                elif carNumber >= 700:
                    CarRegistry.totalCarCounter -= 100
                 else:
                     # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
