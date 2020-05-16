@@ -148,7 +148,7 @@ class Simulation(object):
                     CarRegistry.totalTripOverheadAverage))
            
             
-            if (cls.tick % 4000) == 0 and Config.parallelMode is False:
+            if (cls.tick % 4500) == 0 and Config.parallelMode is False:
                 x = counter / 6
                 counter += 1
                 if x < 1:
