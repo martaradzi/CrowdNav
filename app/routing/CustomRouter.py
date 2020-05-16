@@ -68,23 +68,23 @@ class CustomRouter(object):
         # isVictim = ??? random x percent (how many % routes have been victomized before)
 
     
-        def costFunction(u, v, e, prev_e):
-            """return cost of the route paying attention to disabled lanes"""
-            if cls.getFlag(e["edgeID"]):
-                return 99999999
-            else:
-                return  cls.getFreshness(e["edgeID"], tick) * \
-                        cls.averageEdgeDurationFactor * \
-                        cls.getAverageEdgeDuration(e["edgeID"]) \
-                        + \
-                        (1 - cls.getFreshness(e["edgeID"], tick)) * \
-                        cls.maxSpeedAndLengthFactor * \
-                        max(1, gauss(1, cls.routeRandomSigma) *
-                        (e['length']) / e['maxSpeed']) \
-                        - \
-                        (1 - cls.getFreshness(e["edgeID"], tick)) * \
-                        cls.freshnessUpdateFactor * \
-                        victimizationChoice
+        # def costFunction(u, v, e, prev_e):
+        #     """return cost of the route paying attention to disabled lanes"""
+        #     if cls.getFlag(e["edgeID"]):
+        #         return 99999999
+        #     else:
+        #         return  cls.getFreshness(e["edgeID"], tick) * \
+        #                 cls.averageEdgeDurationFactor * \
+        #                 cls.getAverageEdgeDuration(e["edgeID"]) \
+        #                 + \
+        #                 (1 - cls.getFreshness(e["edgeID"], tick)) * \
+        #                 cls.maxSpeedAndLengthFactor * \
+        #                 max(1, gauss(1, cls.routeRandomSigma) *
+        #                 (e['length']) / e['maxSpeed']) \
+        #                 - \
+        #                 (1 - cls.getFreshness(e["edgeID"], tick)) * \
+        #                 cls.freshnessUpdateFactor * \
+        #                 victimizationChoice
 
 
         isVictim = cls.explorationPercentage > random()
@@ -93,21 +93,21 @@ class CustomRouter(object):
         else:
             victimizationChoice = 0
 
-        # cost_func = lambda u, v, e, prev_e: \
-        #     cls.getFreshness(e["edgeID"], tick) * \
-        #     cls.averageEdgeDurationFactor * \
-        #     cls.getAverageEdgeDuration(e["edgeID"]) \
-        #     + \
-        #     (1 - cls.getFreshness(e["edgeID"], tick)) * \
-        #     cls.maxSpeedAndLengthFactor * \
-        #     max(1, gauss(1, cls.routeRandomSigma) *
-        #     (e['length']) / e['maxSpeed']) \
-        #     - \
-        #     (1 - cls.getFreshness(e["edgeID"], tick)) * \
-        #     cls.freshnessUpdateFactor * \
-        #     victimizationChoice
+        cost_func = lambda u, v, e, prev_e: \
+            cls.getFreshness(e["edgeID"], tick) * \
+            cls.averageEdgeDurationFactor * \
+            cls.getAverageEdgeDuration(e["edgeID"]) \
+            + \
+            (1 - cls.getFreshness(e["edgeID"], tick)) * \
+            cls.maxSpeedAndLengthFactor * \
+            max(1, gauss(1, cls.routeRandomSigma) *
+            (e['length']) / e['maxSpeed']) \
+            - \
+            (1 - cls.getFreshness(e["edgeID"], tick)) * \
+            cls.freshnessUpdateFactor * \
+            victimizationChoice
 
-        cost_func = lambda u, v, e, prev_e: costFunction(u, v, e, prev_e)
+        # cost_func = lambda u, v, e, prev_e: costFunction(u, v, e, prev_e)
         # generate route
         route = find_path(cls.graph, fr, to, cost_func=cost_func)
         return RouterResult(route, isVictim)
