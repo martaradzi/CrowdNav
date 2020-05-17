@@ -6,11 +6,11 @@ if __name__ == "__main__":
     try:
         processID = int(sys.argv[1])
         parallelMode = True
-        useGUI = True
+        useGUI = False
     except:
         processID = 0
         parallelMode = False
-        useGUI = True
+        useGUI = False
     if processID is not None:
         # Starting the application
         Boot.start(processID, parallelMode,useGUI)
