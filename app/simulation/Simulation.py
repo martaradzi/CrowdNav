@@ -203,20 +203,20 @@ class Simulation(object):
                     n = 450
                     # change lane avilibility if not already closed
                     if road_closed == False:
-                        traci.lane.setMaxSpeed('-2748_0', 0.1)
-                        traci.lane.setMaxSpeed('-2748_1', 0.1)
-                        traci.lane.setMaxSpeed('2748_0', 0.1)
-                        traci.lane.setMaxSpeed('2748_1', 0.1)
+                        traci.lane.setMaxSpeed('-2748_0', 0.025)
+                        traci.lane.setMaxSpeed('-2748_1', 0.025)
+                        traci.lane.setMaxSpeed('2748_0', 0.025)
+                        traci.lane.setMaxSpeed('2748_1', 0.025)
 
-                        traci.lane.setMaxSpeed('-2808_0', 0.1)
-                        traci.lane.setMaxSpeed('-2808_1', 0.1)
-                        traci.lane.setMaxSpeed('2808_0', 0.1)
-                        traci.lane.setMaxSpeed('2808_1', 0.1)
+                        traci.lane.setMaxSpeed('-2808_0', 0.025)
+                        traci.lane.setMaxSpeed('-2808_1', 0.025)
+                        traci.lane.setMaxSpeed('2808_0', 0.025)
+                        traci.lane.setMaxSpeed('2808_1', 0.025)
 
-                        traci.lane.setMaxSpeed('-2954_0', 0.1)
-                        traci.lane.setMaxSpeed('-2954_1', 0.1)
-                        traci.lane.setMaxSpeed('2954_0', 0.1)
-                        traci.lane.setMaxSpeed('2954_1', 0.1)
+                        traci.lane.setMaxSpeed('-2954_0', 0.025)
+                        traci.lane.setMaxSpeed('-2954_1', 0.025)
+                        traci.lane.setMaxSpeed('2954_0', 0.025)
+                        traci.lane.setMaxSpeed('2954_1', 0.025)
                         road_closed = True
                     # reset counter to start a new 'day'
                     counter = 1
