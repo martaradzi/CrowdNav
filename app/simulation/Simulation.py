@@ -153,6 +153,34 @@ class Simulation(object):
                 counter += 1
                 if x < 1:
                     n = 450
+                    # traci.lane.setMaxSpeed('-2748_0', 0.025)
+                    # traci.lane.setMaxSpeed('-2748_1', 0.025)
+                    # traci.lane.setMaxSpeed('2748_0', 0.025)
+                    # traci.lane.setMaxSpeed('2748_1', 0.025)
+
+                    # traci.lane.setMaxSpeed('-2808_0', 0.025)
+                    # traci.lane.setMaxSpeed('-2808_1', 0.025)
+                    # traci.lane.setMaxSpeed('2808_0', 0.025)
+                    # traci.lane.setMaxSpeed('2808_1', 0.025)
+
+                    # traci.lane.setMaxSpeed('-2954_0', 0.025)
+                    # traci.lane.setMaxSpeed('-2954_1', 0.025)
+                    # traci.lane.setMaxSpeed('2954_0', 0.025)
+                    # traci.lane.setMaxSpeed('2954_1', 0.025)
+
+                    # autostrada
+                    # traci.lane.setMaxSpeed('-gneE35_0', 0.1)
+                    # traci.lane.setMaxSpeed('-gneE35_1', 0.1)
+                    # traci.lane.setMaxSpeed('gneE35_0', 0.1)
+                    # traci.lane.setMaxSpeed('gneE35_1', 0.1)
+
+                    # MOST
+                    # traci.lane.setMaxSpeed('-2883_0', 0.1)
+                    # traci.lane.setMaxSpeed('-2910_0', 0.1)
+                    # traci.lane.setMaxSpeed('2883_0', 0.1)
+                    # traci.lane.setMaxSpeed('2910_0', 0.1)
+
+                    
                 elif x >= 1 and x < 2:
                     n = 520               
                 elif x >= 2 and x < 3:
@@ -202,22 +230,12 @@ class Simulation(object):
                 else:
                     n = 450
                     # change lane avilibility if not already closed
-                    if road_closed == False:
-                        traci.lane.setMaxSpeed('-2748_0', 0.025)
-                        traci.lane.setMaxSpeed('-2748_1', 0.025)
-                        traci.lane.setMaxSpeed('2748_0', 0.025)
-                        traci.lane.setMaxSpeed('2748_1', 0.025)
-
-                        traci.lane.setMaxSpeed('-2808_0', 0.025)
-                        traci.lane.setMaxSpeed('-2808_1', 0.025)
-                        traci.lane.setMaxSpeed('2808_0', 0.025)
-                        traci.lane.setMaxSpeed('2808_1', 0.025)
-
-                        traci.lane.setMaxSpeed('-2954_0', 0.025)
-                        traci.lane.setMaxSpeed('-2954_1', 0.025)
-                        traci.lane.setMaxSpeed('2954_0', 0.025)
-                        traci.lane.setMaxSpeed('2954_1', 0.025)
-                        road_closed = True
+                    # if road_closed == False:
+                    traci.lane.setMaxSpeed('-gneE35_0', 0.1)
+                    traci.lane.setMaxSpeed('-gneE35_1', 0.1)
+                    traci.lane.setMaxSpeed('gneE35_0', 0.1)
+                    traci.lane.setMaxSpeed('gneE35_1', 0.1)
+                        # road_closed = True
                     # reset counter to start a new 'day'
                     counter = 1
 
