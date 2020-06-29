@@ -10,6 +10,7 @@ from app.routing.CustomRouter import CustomRouter
 from app.routing.RouterResult import RouterResult
 from app.streaming import RTXForword
 
+random.seed(1)
 
 class Car:
     """ a abstract class of something that is driving around in the streets """

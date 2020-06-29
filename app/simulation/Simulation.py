@@ -148,7 +148,7 @@ class Simulation(object):
                     CarRegistry.totalTripOverheadAverage))
            
             
-            if (cls.tick % 5000) == 0 and Config.parallelMode is False:
+            if (cls.tick % 800) == 0 and Config.parallelMode is False:
                 x = counter / 6
                 counter += 1
                 if x < 1:
@@ -231,12 +231,16 @@ class Simulation(object):
                     n = 450
                     # change lane avilibility if not already closed
                     # if road_closed == False:
-                    traci.lane.setMaxSpeed('-gneE35_0', 0.1)
-                    traci.lane.setMaxSpeed('-gneE35_1', 0.1)
-                    traci.lane.setMaxSpeed('gneE35_0', 0.1)
-                    traci.lane.setMaxSpeed('gneE35_1', 0.1)
+                    # traci.lane.setMaxSpeed('-gneE35_0', 0.1)
+                    # traci.lane.setMaxSpeed('-gneE35_1', 0.1)
+                    # traci.lane.setMaxSpeed('gneE35_0', 0.1)
+                    # traci.lane.setMaxSpeed('gneE35_1', 0.1)
                         # road_closed = True
                     # reset counter to start a new 'day'
+                    traci.lane.setMaxSpeed('-2883_0', 0.1)
+                    traci.lane.setMaxSpeed('-2910_0', 0.1)
+                    traci.lane.setMaxSpeed('2883_0', 0.1)
+                    traci.lane.setMaxSpeed('2910_0', 0.1)
                     counter = 1
 
                 CarRegistry.totalCarCounter = n
