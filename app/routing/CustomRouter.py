@@ -17,7 +17,7 @@ class CustomRouter(object):
     # the percentage of smart cars that should be used for exploration
     explorationPercentage = 0.0 # INITIAL JSON DEFINED!!!
     # randomizes the routes
-    routeRandomSigma = 0.2 # INITIAL JSON DEFINED!!!
+    routeRandomSigma = 0 # INITIAL JSON DEFINED!!!
     # how much speed influences the routing
     maxSpeedAndLengthFactor = 1 # INITIAL JSON DEFINED!!!
     # multiplies the average edge value
