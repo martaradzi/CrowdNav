@@ -17,7 +17,7 @@ class CustomRouter(object):
     # the percentage of smart cars that should be used for exploration
     explorationPercentage = 0.0 # INITIAL JSON DEFINED!!!
     # randomizes the routes
-    routeRandomSigma = 0.2 # INITIAL JSON DEFINED!!!
+    routeRandomSigma = 0 # INITIAL JSON DEFINED!!!
     # how much speed influences the routing
     maxSpeedAndLengthFactor = 1 # INITIAL JSON DEFINED!!!
     # multiplies the average edge value
@@ -38,7 +38,7 @@ class CustomRouter(object):
             self.edgeMap[edge.id] = edge
             self.graph.add_edge(edge.fromNodeID, edge.toNodeID,
                                 {'length': edge.length, 'maxSpeed': edge.maxSpeed,
-                                 'lanes': len(edge.lanes), 'edgeID': edge.id})
+                                 'lanes': len(edge.lanes), 'edgeID': edge.id, 'accidentFlag': edge.accidentFlag})
 
     @classmethod
     def minimalRoute(cls, fr, to, tick, car):
@@ -46,6 +46,8 @@ class CustomRouter(object):
         cost_func = lambda u, v, e, prev_e: e['length'] / e['maxSpeed']
         route = find_path(cls.graph, fr, to, cost_func=cost_func)
         return RouterResult(route, False)
+
+
 
     @classmethod
     def route(cls, fr, to, tick, car):
@@ -64,6 +66,27 @@ class CustomRouter(object):
         # else:
         # 2) Advanced cost function that combines duration with averaging
         # isVictim = ??? random x percent (how many % routes have been victomized before)
+
+    
+        # def costFunction(u, v, e, prev_e):
+        #     """return cost of the route paying attention to disabled lanes"""
+        #     if cls.getFlag(e["edgeID"]):
+        #         return 99999999
+        #     else:
+        #         return  cls.getFreshness(e["edgeID"], tick) * \
+        #                 cls.averageEdgeDurationFactor * \
+        #                 cls.getAverageEdgeDuration(e["edgeID"]) \
+        #                 + \
+        #                 (1 - cls.getFreshness(e["edgeID"], tick)) * \
+        #                 cls.maxSpeedAndLengthFactor * \
+        #                 max(1, gauss(1, cls.routeRandomSigma) *
+        #                 (e['length']) / e['maxSpeed']) \
+        #                 - \
+        #                 (1 - cls.getFreshness(e["edgeID"], tick)) * \
+        #                 cls.freshnessUpdateFactor * \
+        #                 victimizationChoice
+
+
         isVictim = cls.explorationPercentage > random()
         if isVictim:
             victimizationChoice = 1
@@ -84,10 +107,18 @@ class CustomRouter(object):
             cls.freshnessUpdateFactor * \
             victimizationChoice
 
+        # cost_func = lambda u, v, e, prev_e: costFunction(u, v, e, prev_e)
         # generate route
         route = find_path(cls.graph, fr, to, cost_func=cost_func)
-        # wrap the route in a result object
         return RouterResult(route, isVictim)
+
+
+    @classmethod
+    def getFlag(cls, edgeID):
+        if cls.edgeMap[edgeID].accidentFlag:
+            return True
+        else:
+            return False
 
     @classmethod
     def getFreshness(cls, edgeID, tick):
@@ -111,6 +142,16 @@ class CustomRouter(object):
     def applyEdgeDurationToAverage(cls, edge, duration, tick):
         """ tries to calculate how long it will take for a single edge """
         try:
+            # print(edge)
             cls.edgeMap[edge].applyEdgeDurationToAverage(duration, tick)
         except:
             return 1
+
+    @classmethod
+    def applyBlockEdgeDuration(cls, edge, tick):
+        """ block an edge """
+        try:
+            cls.edgeMap[edge].applyBlockEdgeDuration(tick)
+        except:
+            return 1
+            

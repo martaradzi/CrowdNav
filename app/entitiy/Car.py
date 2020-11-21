@@ -10,6 +10,7 @@ from app.routing.CustomRouter import CustomRouter
 from app.routing.RouterResult import RouterResult
 from app.streaming import RTXForword
 
+random.seed(500)
 
 class Car:
     """ a abstract class of something that is driving around in the streets """
@@ -111,6 +112,12 @@ class Car:
         # import here because python can not handle circular-dependencies
         if self.targetID is None:
             self.sourceID = random.choice(Network.nodes).getID()
+            # if self.sourceID == '2748_0':
+            #     print('yaas')
+            # while self.sourceID == '2748' or self.sourceID == '-2748':
+            #     self.sourceID = random.choice(Network.nodes).getID()
+            # print(type(Network.nodes))
+            # print(self.sourceID)
         else:
             self.sourceID = self.targetID  # We start where we stopped
         # random target
@@ -146,8 +153,19 @@ class Car:
                 except traci.exceptions.TraCIException as e:
                     # print(e)
                     pass
+        # print(self.id)
+        # print(self.currentEdgeID)
+        # print(traci.vehicle.getSubscriptionResults(self.id))
 
-        roadID = traci.vehicle.getSubscriptionResults(self.id)[80]
+        result = traci.vehicle.getSubscriptionResults(self.id)
+        # # check if lanes are closed
+        # if result is None:
+        #     edges = ['-2748', '2748'] #, '2808', '-2808', '-2954', '2954']
+        #     for i in edges:
+        #         CustomRouter.applyBlockEdgeDuration(i, tick)   
+        #     return 
+
+        roadID = result[80]
         if roadID != self.currentEdgeID and self.smartCar:
             if self.currentEdgeBeginTick is not None:
                 CustomRouter.applyEdgeDurationToAverage(self.currentEdgeID, tick - self.currentEdgeBeginTick, tick)
@@ -158,6 +176,7 @@ class Car:
                 # msg["tick"] = tick
                 # msg["edgeID"] = self.currentEdgeID,
                 # msg["duration"] = tick - self.currentEdgeBeginTick
+
             # print("changed route to: " + roadID)
             self.currentEdgeBeginTick = tick
             self.currentEdgeID = roadID
@@ -192,4 +211,7 @@ class Car:
 
     def remove(self):
         """" removes this car from the sumo simulation through traci """
-        traci.vehicle.remove(self.id)
+        try:
+            traci.vehicle.remove(self.id)
+        except traci.exceptions.TraCIException:
+            pass

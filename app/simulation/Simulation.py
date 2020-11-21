@@ -58,7 +58,11 @@ class Simulation(object):
     def loop(cls):
         """ loops the simulation """
 
-        counter = 0
+        counter = 1
+        road_closed = False
+        dissallowed_classes = ['private','emergency','army','vip','passenger','hov','taxi','bus','coach',
+        'delivery','truck','trailer','tram','rail_urban','rail','rail_electric','motorcycle','moped','bicycle',
+        'pedestrian','evehicle','ship','custom1','custom2']
 
         # start listening to all cars that arrived at their target
         traci.simulation.subscribe((tc.VAR_ARRIVED_VEHICLES_IDS,))
@@ -145,34 +149,69 @@ class Simulation(object):
            
             
             if (cls.tick % 5000) == 0 and Config.parallelMode is False:
-                # if counter == 14 or counter == 15 or counter == 30:
-                #     CarRegistry.totalCarCounter = 200
-                # elif counter == 0 or counter == 13 or counter == 16 or counter == 29:
-                #     CarRegistry.totalCarCounter = 300
-                # elif counter == 1 or counter == 12 or counter == 17 or counter == 28:
-                #     CarRegistry.totalCarCounter = 400
-                # elif counter == 2 or counter == 11 or counter == 18 or counter == 27:
-                #     CarRegistry.totalCarCounter = 500
-                # elif counter == 3 or counter == 10 or counter == 19 or counter == 26:
-                #     CarRegistry.totalCarCounter = 600
-                # elif counter == 4 or counter == 9 or counter == 20 or counter == 25:
-                #     CarRegistry.totalCarCounter = 700
-                # elif counter == 5 or counter == 8 or counter == 21 or counter == 24:
-                #     CarRegistry.totalCarCounter = 800
-                # else:
-                #     CarRegistry.totalCarCounter = 900
-                # counter += 1
-                # CarRegistry.applyCarCounter()
-                carNumber = CarRegistry.totalCarCounter
-                if carNumber <= 200:
-                   CarRegistry.totalCarCounter += 100
-                elif carNumber >= 700:
-                   CarRegistry.totalCarCounter -= 100
+                x = counter / 6
+                counter += 1
+                if x < 1:
+                    n = 450
+                elif x >= 1 and x < 2:
+                    n = 520               
+                elif x >= 2 and x < 3:
+                    n =	600
+                elif x >= 3 and x < 4:
+                    n = 350
+                elif x >= 4 and x < 5:
+                    n = 200
+                elif x >= 5 and x < 6:
+                    n = 50
+                elif x >= 6 and x < 7:
+                    n = 200
+                elif x >= 7 and x < 8:
+                    n = 50
+                elif x >= 8 and x < 9:
+                    n = 150
+                elif x >= 9 and x <10:
+                    n = 500
+                elif x >= 10 and x < 11:
+                    n = 550
+                elif x >= 11 and x < 12:
+                    n = 620
+                elif x >= 12 and x < 13:
+                    n = 500
+                elif x >= 13 and x < 14:
+                    n = 300
+                elif x >= 14 and x < 15:
+                    n = 100
+                elif x >= 15 and x < 16:
+                    n = 100
+                elif x >= 16 and x < 17:
+                    n = 550
+                elif x >= 17 and x < 18:
+                    n = 500
+                elif x >= 18 and x < 19:
+                    n = 600
+                elif x >= 19 and x < 20:
+                    n = 720
+                elif x >= 20 and x < 21:
+                    n = 350
+                elif x >= 21 and x < 22:
+                    n = 200
+                elif x >= 22 and x < 23:
+                    n = 70
+                elif x >= 23 and x < 24:
+                    n = 500
                 else:
-                    # n = random.choice([(carNumber+random.randint(50,101)), (carNumber-random.randint(50,101))])
-                    CarRegistry.totalCarCounter =  random.choice([(carNumber+100), (carNumber-100)])
+                    n = 450
+                    # change lane avilibility if not already closed
+                    # reset counter to start a new 'day'
+                    traci.lane.setMaxSpeed('-2883_0', 0.1)
+                    traci.lane.setMaxSpeed('-2910_0', 0.1)
+                    traci.lane.setMaxSpeed('2883_0', 0.1)
+                    traci.lane.setMaxSpeed('2910_0', 0.1)
+                    counter = 1
 
+                CarRegistry.totalCarCounter = n
                 CarRegistry.applyCarCounter()
+                
 
             if (cls.tick % 10) == 0:
                 msg = dict()
